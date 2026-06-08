@@ -110,14 +110,14 @@ export default function LeaderboardPage() {
               <div
                 key={entry.username}
                 className={`glass-card flex items-center gap-4 p-4 transition-all ${
-                  i < 3 ? "border-amber-500/20" : ""
+                  i < 3 ? "border-zinc-700" : ""
                 }`}
               >
                 <div className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold ${
-                  i === 0 ? "bg-amber-500/20 text-amber-400" :
-                  i === 1 ? "bg-slate-400/20 text-slate-300" :
-                  i === 2 ? "bg-orange-500/20 text-orange-400" :
-                  "bg-white/10 text-slate-400"
+                  i === 0 ? "bg-white/15 text-white" :
+                  i === 1 ? "bg-zinc-700/50 text-zinc-300" :
+                  i === 2 ? "bg-zinc-800 text-zinc-400" :
+                  "bg-zinc-900 text-zinc-500"
                 }`}>
                   {i + 1}
                 </div>
@@ -130,7 +130,7 @@ export default function LeaderboardPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-violet-400">{entry.total}</div>
+                  <div className="text-2xl font-bold text-white">{entry.total}</div>
                   <div className="text-xs text-slate-500">points</div>
                 </div>
               </div>

@@ -71,7 +71,7 @@ export default function AdminPage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            {msg && <span className="text-sm text-emerald-400">{msg}</span>}
+            {msg && <span className="text-sm text-zinc-300">{msg}</span>}
             <button onClick={handleSave} disabled={saving} className="btn-primary">
               {saving ? "Saving..." : "Save Results"}
             </button>
@@ -82,7 +82,7 @@ export default function AdminPage() {
         <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {GROUPS.map((group) => (
             <div key={group.name} className="glass-card p-4">
-              <h3 className="mb-3 text-sm font-bold text-violet-400">Group {group.name}</h3>
+              <h3 className="mb-3 text-sm font-bold text-zinc-400">Group {group.name}</h3>
               {[0, 1, 2, 3].map((pos) => (
                 <div key={pos} className="mb-2 flex items-center gap-2">
                   <span className="w-6 text-center text-xs font-bold text-slate-500">

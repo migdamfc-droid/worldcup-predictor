@@ -56,7 +56,7 @@ export default function Auth({ onAuth }: { onAuth: () => void }) {
                 type="text"
                 value={username}
                 onChange={(e) => setUsernameInput(e.target.value)}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-violet-500"
+                className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500"
                 placeholder="Your name"
                 required
               />
@@ -68,7 +68,7 @@ export default function Auth({ onAuth }: { onAuth: () => void }) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-violet-500"
+              className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500"
               placeholder="you@example.com"
               required
             />
@@ -79,7 +79,7 @@ export default function Auth({ onAuth }: { onAuth: () => void }) {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-violet-500"
+              className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500"
               placeholder="••••••••"
               minLength={6}
               required
@@ -99,7 +99,7 @@ export default function Auth({ onAuth }: { onAuth: () => void }) {
           {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
           <button
             onClick={() => { setIsLogin(!isLogin); setError(""); }}
-            className="text-violet-400 hover:text-violet-300"
+            className="text-zinc-400 hover:text-zinc-300"
           >
             {isLogin ? "Sign up" : "Sign in"}
           </button>
