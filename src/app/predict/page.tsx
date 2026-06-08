@@ -44,7 +44,7 @@ const THIRD_PLACE_SLOTS = [
   { matchId: "r32_15", label: "vs 1K" },
 ];
 
-const LOCKOUT_DATE = new Date("2026-06-11T18:00:00Z");
+const LOCKOUT_DATE = new Date("2026-06-11T20:00:00Z");
 
 export default function PredictPage() {
   const [user, setUser] = useState<User | null>(null);
