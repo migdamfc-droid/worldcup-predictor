@@ -44,6 +44,8 @@ const THIRD_PLACE_SLOTS = [
   { matchId: "r32_15", label: "vs 1K" },
 ];
 
+const LOCKOUT_DATE = new Date("2026-06-11T18:00:00Z");
+
 export default function PredictPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -53,6 +55,7 @@ export default function PredictPage() {
   const [saveMsg, setSaveMsg] = useState("");
   const [dragState, setDragState] = useState<{ group: string; index: number } | null>(null);
   const [authKey, setAuthKey] = useState(0);
+  const locked = new Date() >= LOCKOUT_DATE;
 
   const checkUser = useCallback(async () => {
     const { data } = await supabase.auth.getUser();
@@ -242,12 +245,14 @@ export default function PredictPage() {
       <div className="mx-auto max-w-7xl px-4 py-6">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Your Predictions</h1>
-          <div className="flex items-center gap-3">
-            {saveMsg && <span className="text-sm text-zinc-300">{saveMsg}</span>}
-            <button onClick={savePredictions} disabled={saving} className="btn-primary">
-              {saving ? "Saving..." : "Save Predictions"}
-            </button>
-          </div>
+          {!locked && (
+            <div className="flex items-center gap-3">
+              {saveMsg && <span className="text-sm text-zinc-300">{saveMsg}</span>}
+              <button onClick={savePredictions} disabled={saving} className="btn-primary">
+                {saving ? "Saving..." : "Save Predictions"}
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="mb-8 flex gap-6 border-b border-white/10 overflow-x-auto">
@@ -263,6 +268,12 @@ export default function PredictPage() {
             </button>
           ))}
         </div>
+
+        {locked && (
+          <div className="mb-6 rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3 text-sm text-zinc-300">
+            Predictions are locked. The tournament has started.
+          </div>
+        )}
 
         {/* Group Stage */}
         {tab === "groups" && (
@@ -287,8 +298,8 @@ export default function PredictPage() {
                         return (
                           <div
                             key={code}
-                            draggable
-                            onDragStart={() => handleDragStart(group.name, i)}
+                            draggable={!locked}
+                            onDragStart={() => !locked && handleDragStart(group.name, i)}
                             onDragOver={(e) => e.preventDefault()}
                             onDrop={() => handleDrop(group.name, i)}
                             className="team-slot"
@@ -341,8 +352,8 @@ export default function PredictPage() {
                 return (
                   <button
                     key={group.name}
-                    onClick={() => !isFull && toggleThirdPlaceGroup(group.name)}
-                    disabled={isFull}
+                    onClick={() => !locked && !isFull && toggleThirdPlaceGroup(group.name)}
+                    disabled={locked || isFull}
                     className={`glass-card p-4 text-left transition-all ${
                       isSelected
                         ? "border-zinc-600 bg-zinc-800"
@@ -435,8 +446,8 @@ export default function PredictPage() {
                             <div key={match.id} className="glass-card p-2">
                               <div className="space-y-1">
                                 <button
-                                  onClick={() => teamA && setKnockoutWinner(match.id, teamA)}
-                                  disabled={!teamA}
+                                  onClick={() => !locked && teamA && setKnockoutWinner(match.id, teamA)}
+                                  disabled={locked || !teamA}
                                   className={`w-full text-left ${
                                     winner === teamA && teamA ? "knockout-team-winner" : "knockout-team"
                                   }`}
@@ -445,8 +456,8 @@ export default function PredictPage() {
                                   <span className="text-xs">{displayA.name}</span>
                                 </button>
                                 <button
-                                  onClick={() => teamB && setKnockoutWinner(match.id, teamB)}
-                                  disabled={!teamB}
+                                  onClick={() => !locked && teamB && setKnockoutWinner(match.id, teamB)}
+                                  disabled={locked || !teamB}
                                   className={`w-full text-left ${
                                     winner === teamB && teamB ? "knockout-team-winner" : "knockout-team"
                                   }`}
@@ -494,7 +505,8 @@ export default function PredictPage() {
                   type="text"
                   value={predictions.topScorer}
                   onChange={(e) => setPredictions((p) => ({ ...p, topScorer: e.target.value }))}
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500"
+                  disabled={locked}
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500 disabled:opacity-50"
                   placeholder="e.g. Kylian Mbappé"
                 />
               </div>
@@ -505,7 +517,8 @@ export default function PredictPage() {
                   type="text"
                   value={predictions.topAssister}
                   onChange={(e) => setPredictions((p) => ({ ...p, topAssister: e.target.value }))}
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500"
+                  disabled={locked}
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500 disabled:opacity-50"
                   placeholder="e.g. Kevin De Bruyne"
                 />
               </div>
@@ -516,7 +529,8 @@ export default function PredictPage() {
                   type="text"
                   value={predictions.bestPlayer}
                   onChange={(e) => setPredictions((p) => ({ ...p, bestPlayer: e.target.value }))}
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500"
+                  disabled={locked}
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500 disabled:opacity-50"
                   placeholder="e.g. Lionel Messi"
                 />
               </div>
