@@ -92,7 +92,7 @@ export default function PredictPage() {
       user_id: user.id,
       group_predictions: predictions.groupPredictions,
       knockout_predictions: koWithMeta,
-      tournament_winner: predictions.tournamentWinner,
+      tournament_winner: predictions.knockoutPredictions["final"] || "",
       top_scorer: predictions.topScorer,
       top_assister: predictions.topAssister,
       best_player: predictions.bestPlayer,
@@ -471,21 +471,22 @@ export default function PredictPage() {
         {tab === "extras" && (
           <div className="animate-fade-in">
             <p className="mb-6 text-slate-400">Make your bonus predictions for extra points!</p>
-            <div className="grid gap-6 sm:grid-cols-2">
-              <div className="glass-card p-6">
-                <h3 className="mb-1 text-lg font-bold">🏆 Tournament Winner</h3>
-                <p className="mb-3 text-xs text-slate-500">+6 points if correct</p>
-                <select
-                  value={predictions.tournamentWinner}
-                  onChange={(e) => setPredictions((p) => ({ ...p, tournamentWinner: e.target.value }))}
-                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-violet-500"
-                >
-                  <option value="">Select a team...</option>
-                  {ALL_TEAMS.map((t) => (
-                    <option key={t.code} value={t.code}>{t.flag} {t.name}</option>
-                  ))}
-                </select>
-              </div>
+            {/* Tournament winner derived from knockout bracket */}
+            {(() => {
+              const finalWinner = predictions.knockoutPredictions["final"];
+              const display = getTeamDisplay(finalWinner || null);
+              return (
+                <div className="mb-6 glass-card p-6">
+                  <h3 className="mb-1 text-lg font-bold">🏆 Your Predicted Winner</h3>
+                  <p className="mb-3 text-xs text-slate-500">+6 points if correct — set by your knockout bracket picks</p>
+                  <div className="flex items-center gap-3 rounded-lg bg-white/5 px-4 py-3">
+                    <span className="text-2xl">{display.flag}</span>
+                    <span className="text-lg font-semibold">{finalWinner ? display.name : "Complete your knockout bracket to set this"}</span>
+                  </div>
+                </div>
+              );
+            })()}
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               <div className="glass-card p-6">
                 <h3 className="mb-1 text-lg font-bold">⚽ Top Scorer</h3>
                 <p className="mb-3 text-xs text-slate-500">+2 points if correct</p>
@@ -529,7 +530,7 @@ export default function PredictPage() {
                   ["Group: 2 correct", "+2 pts", "text-emerald-400"],
                   ["Group: 1 correct", "+1 pt", "text-emerald-400"],
                   ["Knockout: Correct result", "+3 pts", "text-emerald-400"],
-                  ["Tournament winner", "+6 pts", "text-amber-400"],
+                  ["Bracket: Tournament winner", "+6 pts", "text-amber-400"],
                   ["Top scorer", "+2 pts", "text-amber-400"],
                   ["Top assister", "+2 pts", "text-amber-400"],
                   ["Best player", "+3 pts", "text-amber-400"],
