@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #111827;
+  --bg-card: #1a2236;
+  --accent: #8b5cf6;
+  --accent-hover: #7c3aed;
+  --gold: #f59e0b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --border: #2d3748;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.glass-card {
+  @apply rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm;
+}
+
+.btn-primary {
+  @apply rounded-lg bg-violet-600 px-6 py-2.5 font-semibold text-white transition-all hover:bg-violet-500 hover:shadow-lg hover:shadow-violet-600/25 active:scale-95;
+}
+
+.btn-secondary {
+  @apply rounded-lg border border-white/20 bg-white/5 px-6 py-2.5 font-semibold text-white transition-all hover:bg-white/10 active:scale-95;
+}
+
+.tab-active {
+  @apply border-b-2 border-violet-500 text-white;
+}
+
+.tab-inactive {
+  @apply border-b-2 border-transparent text-slate-400 hover:text-slate-200;
+}
+
+.team-slot {
+  @apply flex cursor-grab items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm transition-all hover:bg-white/10 active:cursor-grabbing;
+}
+
+.team-slot-selected {
+  @apply border-violet-500/50 bg-violet-500/10;
+}
+
+.knockout-team {
+  @apply cursor-pointer rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm transition-all hover:border-violet-500/50 hover:bg-violet-500/10;
+}
+
+.knockout-team-winner {
+  @apply border-emerald-500/50 bg-emerald-500/15 text-emerald-300;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
