@@ -153,7 +153,7 @@ export async function GET(request: Request) {
     };
     const SF_NUM_TO_ID: Record<number, string> = { 101: "sf_1", 102: "sf_2" };
 
-    const allKoMaps = { ...R32_NUM_TO_ID, ...R16_NUM_TO_ID, ...QF_NUM_TO_ID, ...SF_NUM_TO_ID, 104: "final" };
+    const allKoMaps: Record<number, string> = { ...R32_NUM_TO_ID, ...R16_NUM_TO_ID, ...QF_NUM_TO_ID, ...SF_NUM_TO_ID, 104: "final" };
 
     for (const match of finishedMatches) {
       const roundStr = match.intRound;
