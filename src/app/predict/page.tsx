@@ -477,7 +477,7 @@ export default function PredictPage() {
               const display = getTeamDisplay(finalWinner || null);
               return (
                 <div className="mb-6 glass-card p-6">
-                  <h3 className="mb-1 text-lg font-bold">🏆 Your Predicted Winner</h3>
+                  <h3 className="mb-1 text-lg font-bold">Your Predicted Winner</h3>
                   <p className="mb-3 text-xs text-slate-500">+6 points if correct — set by your knockout bracket picks</p>
                   <div className="flex items-center gap-3 rounded-lg bg-white/5 px-4 py-3">
                     <span className="text-2xl">{display.flag}</span>
@@ -488,7 +488,7 @@ export default function PredictPage() {
             })()}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               <div className="glass-card p-6">
-                <h3 className="mb-1 text-lg font-bold">⚽ Top Scorer</h3>
+                <h3 className="mb-1 text-lg font-bold">Top Scorer</h3>
                 <p className="mb-3 text-xs text-slate-500">+2 points if correct</p>
                 <input
                   type="text"
@@ -499,7 +499,7 @@ export default function PredictPage() {
                 />
               </div>
               <div className="glass-card p-6">
-                <h3 className="mb-1 text-lg font-bold">🎯 Top Assister</h3>
+                <h3 className="mb-1 text-lg font-bold">Top Assister</h3>
                 <p className="mb-3 text-xs text-slate-500">+2 points if correct</p>
                 <input
                   type="text"
@@ -510,7 +510,7 @@ export default function PredictPage() {
                 />
               </div>
               <div className="glass-card p-6">
-                <h3 className="mb-1 text-lg font-bold">🌟 Best Player</h3>
+                <h3 className="mb-1 text-lg font-bold">Best Player</h3>
                 <p className="mb-3 text-xs text-slate-500">+3 points if correct</p>
                 <input
                   type="text"
