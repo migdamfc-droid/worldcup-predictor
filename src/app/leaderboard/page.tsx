@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { calculateScore, type Predictions, type ActualResults } from "@/lib/scoring";
 import Navbar from "@/components/Navbar";
@@ -310,7 +311,7 @@ export default function LeaderboardPage() {
                   {i + 1}
                 </div>
                 <div className="flex-1">
-                  <div className="font-semibold">{entry.username}</div>
+                  <Link href={`/predictions/${entry.userId}`} className="font-semibold hover:underline">{entry.username}</Link>
                   <div className="flex gap-3 text-xs text-zinc-500">
                     <span>Groups: {entry.groupPoints}</span>
                     <span>Knockout: {entry.knockoutPoints}</span>
