@@ -44,7 +44,12 @@ const THIRD_PLACE_SLOTS = [
   { matchId: "r32_15", label: "vs 1K" },
 ];
 
-const LOCKOUT_DATE = new Date("2026-06-11T20:00:00Z");
+// Group stage + bonus lock after first match ends
+const GROUPS_LOCKOUT = new Date("2026-06-11T20:00:00Z");
+// Knockout predictions unlock when knockout stage begins
+const KNOCKOUT_UNLOCK = new Date("2026-06-28T14:00:00Z");
+// Knockout predictions lock when first knockout match ends (~2h)
+const KNOCKOUT_LOCKOUT = new Date("2026-06-28T18:00:00Z");
 
 export default function PredictPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -55,7 +60,11 @@ export default function PredictPage() {
   const [saveMsg, setSaveMsg] = useState("");
   const [dragState, setDragState] = useState<{ group: string; index: number } | null>(null);
   const [authKey, setAuthKey] = useState(0);
-  const locked = new Date() >= LOCKOUT_DATE;
+  const now = new Date();
+  const groupsLocked = now >= GROUPS_LOCKOUT;
+  const knockoutOpen = now >= KNOCKOUT_UNLOCK && now < KNOCKOUT_LOCKOUT;
+  const knockoutLocked = now >= KNOCKOUT_LOCKOUT;
+  const locked = groupsLocked && knockoutLocked;
 
   const checkUser = useCallback(async () => {
     const { data } = await supabase.auth.getUser();
@@ -245,7 +254,7 @@ export default function PredictPage() {
       <div className="mx-auto max-w-7xl px-4 py-6">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Your Predictions</h1>
-          {!locked && (
+          {(!groupsLocked || knockoutOpen) && (
             <div className="flex items-center gap-3">
               {saveMsg && <span className="text-sm text-zinc-300">{saveMsg}</span>}
               <button onClick={savePredictions} disabled={saving} className="btn-primary">
@@ -269,9 +278,19 @@ export default function PredictPage() {
           ))}
         </div>
 
+        {groupsLocked && !knockoutOpen && !knockoutLocked && (
+          <div className="mb-6 rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3 text-sm text-zinc-300">
+            Group stage and bonus predictions are locked. Knockout predictions will unlock when the knockout stage begins.
+          </div>
+        )}
+        {knockoutOpen && (
+          <div className="mb-6 rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3 text-sm text-zinc-300">
+            Knockout predictions are now open! Make your picks before the first knockout match ends.
+          </div>
+        )}
         {locked && (
           <div className="mb-6 rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3 text-sm text-zinc-300">
-            Predictions are locked. The tournament has started.
+            All predictions are locked. The tournament is underway.
           </div>
         )}
 
@@ -298,8 +317,8 @@ export default function PredictPage() {
                         return (
                           <div
                             key={code}
-                            draggable={!locked}
-                            onDragStart={() => !locked && handleDragStart(group.name, i)}
+                            draggable={!groupsLocked}
+                            onDragStart={() => !groupsLocked && handleDragStart(group.name, i)}
                             onDragOver={(e) => e.preventDefault()}
                             onDrop={() => handleDrop(group.name, i)}
                             className="team-slot"
@@ -352,8 +371,8 @@ export default function PredictPage() {
                 return (
                   <button
                     key={group.name}
-                    onClick={() => !locked && !isFull && toggleThirdPlaceGroup(group.name)}
-                    disabled={locked || isFull}
+                    onClick={() => !groupsLocked && !isFull && toggleThirdPlaceGroup(group.name)}
+                    disabled={groupsLocked || isFull}
                     className={`glass-card p-4 text-left transition-all ${
                       isSelected
                         ? "border-zinc-600 bg-zinc-800"
@@ -406,6 +425,11 @@ export default function PredictPage() {
         {/* Knockout */}
         {tab === "knockout" && (
           <div className="animate-fade-in">
+            {!knockoutOpen && !knockoutLocked && (
+              <div className="mb-6 rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3 text-sm text-zinc-300">
+                Knockout predictions will unlock once the group stage is over and the knockout bracket is set. Check back then!
+              </div>
+            )}
             <p className="mb-6 text-slate-400">
               Click on the team you think will win each match. Teams are seeded from your group and 3rd-place predictions.
             </p>
@@ -446,8 +470,8 @@ export default function PredictPage() {
                             <div key={match.id} className="glass-card p-2">
                               <div className="space-y-1">
                                 <button
-                                  onClick={() => !locked && teamA && setKnockoutWinner(match.id, teamA)}
-                                  disabled={locked || !teamA}
+                                  onClick={() => knockoutOpen && teamA && setKnockoutWinner(match.id, teamA)}
+                                  disabled={!knockoutOpen || !teamA}
                                   className={`w-full text-left ${
                                     winner === teamA && teamA ? "knockout-team-winner" : "knockout-team"
                                   }`}
@@ -456,8 +480,8 @@ export default function PredictPage() {
                                   <span className="text-xs">{displayA.name}</span>
                                 </button>
                                 <button
-                                  onClick={() => !locked && teamB && setKnockoutWinner(match.id, teamB)}
-                                  disabled={locked || !teamB}
+                                  onClick={() => knockoutOpen && teamB && setKnockoutWinner(match.id, teamB)}
+                                  disabled={!knockoutOpen || !teamB}
                                   className={`w-full text-left ${
                                     winner === teamB && teamB ? "knockout-team-winner" : "knockout-team"
                                   }`}
@@ -505,7 +529,7 @@ export default function PredictPage() {
                   type="text"
                   value={predictions.topScorer}
                   onChange={(e) => setPredictions((p) => ({ ...p, topScorer: e.target.value }))}
-                  disabled={locked}
+                  disabled={groupsLocked}
                   className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500 disabled:opacity-50"
                   placeholder="e.g. Kylian Mbappé"
                 />
@@ -517,7 +541,7 @@ export default function PredictPage() {
                   type="text"
                   value={predictions.topAssister}
                   onChange={(e) => setPredictions((p) => ({ ...p, topAssister: e.target.value }))}
-                  disabled={locked}
+                  disabled={groupsLocked}
                   className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500 disabled:opacity-50"
                   placeholder="e.g. Kevin De Bruyne"
                 />
@@ -529,7 +553,7 @@ export default function PredictPage() {
                   type="text"
                   value={predictions.bestPlayer}
                   onChange={(e) => setPredictions((p) => ({ ...p, bestPlayer: e.target.value }))}
-                  disabled={locked}
+                  disabled={groupsLocked}
                   className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500 disabled:opacity-50"
                   placeholder="e.g. Lionel Messi"
                 />
