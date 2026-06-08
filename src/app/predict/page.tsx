@@ -299,12 +299,12 @@ export default function PredictPage() {
                             <span className="text-lg">{team.flag}</span>
                             <span className="font-medium">{team.name}</span>
                             {i < 2 && (
-                              <span className="ml-auto rounded-full bg-zinc-700/50 px-2 py-0.5 text-xs text-zinc-300">
+                              <span className="ml-auto rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-400">
                                 Qualifies
                               </span>
                             )}
                             {i === 2 && (
-                              <span className="ml-auto rounded-full bg-zinc-700/50 px-2 py-0.5 text-xs text-zinc-300">
+                              <span className="ml-auto rounded-full bg-orange-500/15 px-2 py-0.5 text-xs text-orange-400">
                                 Possible
                               </span>
                             )}
