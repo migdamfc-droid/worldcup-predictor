@@ -208,6 +208,15 @@ export default function PredictPage() {
     setDragState(null);
   };
 
+  const moveTeam = (group: string, index: number, direction: "up" | "down") => {
+    if (locked) return;
+    const order = [...(predictions.groupPredictions[group] || GROUPS.find(g => g.name === group)!.teams.map(t => t.code))];
+    const newIndex = direction === "up" ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= order.length) return;
+    [order[index], order[newIndex]] = [order[newIndex], order[index]];
+    setGroupOrder(group, order);
+  };
+
   if (loading) {
     return (
       <>
@@ -243,7 +252,7 @@ export default function PredictPage() {
     <>
       <Navbar key={authKey} />
       <div className="mx-auto max-w-7xl px-4 py-6">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-2xl font-bold">Your Predictions</h1>
           {!locked && (
             <div className="flex items-center gap-3">
@@ -279,7 +288,7 @@ export default function PredictPage() {
         {tab === "groups" && (
           <div className="animate-fade-in">
             <p className="mb-6 text-slate-400">
-              Drag teams to predict the final standings for each group. Position 1 = group winner.
+              Reorder teams to predict the final standings for each group. Position 1 = group winner.
             </p>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {GROUPS.map((group) => {
@@ -304,18 +313,38 @@ export default function PredictPage() {
                             onDrop={() => handleDrop(group.name, i)}
                             className="team-slot"
                           >
-                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-xs font-bold">
+                            {!locked && (
+                              <div className="flex flex-col -my-1">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); moveTeam(group.name, i, "up"); }}
+                                  disabled={i === 0}
+                                  className="text-zinc-500 hover:text-white disabled:opacity-20 p-0.5"
+                                  aria-label="Move up"
+                                >
+                                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); moveTeam(group.name, i, "down"); }}
+                                  disabled={i === order.length - 1}
+                                  className="text-zinc-500 hover:text-white disabled:opacity-20 p-0.5"
+                                  aria-label="Move down"
+                                >
+                                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                                </button>
+                              </div>
+                            )}
+                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold">
                               {i + 1}
                             </span>
                             <span className="text-lg">{team.flag}</span>
-                            <span className="font-medium">{team.name}</span>
+                            <span className="font-medium text-sm">{team.name}</span>
                             {i < 2 && (
-                              <span className="ml-auto rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-400">
+                              <span className="ml-auto rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-400 hidden sm:inline">
                                 Qualifies
                               </span>
                             )}
                             {i === 2 && (
-                              <span className="ml-auto rounded-full bg-orange-500/15 px-2 py-0.5 text-xs text-orange-400">
+                              <span className="ml-auto rounded-full bg-orange-500/15 px-2 py-0.5 text-xs text-orange-400 hidden sm:inline">
                                 Possible
                               </span>
                             )}

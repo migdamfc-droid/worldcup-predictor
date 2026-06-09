@@ -220,25 +220,27 @@ export default function LeaderboardPage() {
     <>
       <Navbar />
       <div className="mx-auto max-w-3xl px-4 py-10">
-        <div className="mb-6 flex items-start justify-between">
-          <div>
-            <h1 className="mb-2 text-3xl font-bold">Leaderboard</h1>
-            <p className="text-sm text-zinc-500">
-              {hasResults
-                ? "Scores update automatically as results come in."
-                : "Scores will appear once tournament results start."}
-            </p>
-          </div>
-          {userId && (
-            <div className="flex gap-2">
-              <button onClick={() => { setShowCreateModal(true); setModalError(""); }} className="btn-secondary text-sm">
-                Create League
-              </button>
-              <button onClick={() => { setShowJoinModal(true); setModalError(""); }} className="btn-primary text-sm">
-                Join League
-              </button>
+        <div className="mb-6">
+          <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h1 className="mb-2 text-3xl font-bold">Leaderboard</h1>
+              <p className="text-sm text-zinc-500">
+                {hasResults
+                  ? "Scores update automatically as results come in."
+                  : "Scores will appear once tournament results start."}
+              </p>
             </div>
-          )}
+            {userId && (
+              <div className="flex gap-2">
+                <button onClick={() => { setShowCreateModal(true); setModalError(""); }} className="btn-secondary text-sm">
+                  Create League
+                </button>
+                <button onClick={() => { setShowJoinModal(true); setModalError(""); }} className="btn-primary text-sm">
+                  Join League
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Tabs */}

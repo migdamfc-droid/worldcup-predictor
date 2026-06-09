@@ -10,6 +10,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const [username, setUsername] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -63,12 +64,11 @@ export default function Navbar() {
           <svg className="h-5 w-5 text-zinc-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5a17.92 17.92 0 01-8.716-2.247m0 0A8.966 8.966 0 013 12c0-1.97.633-3.794 1.708-5.282" />
           </svg>
-          <span className="text-white">
-            WC 2026
-          </span>
+          <span className="text-white">WC 2026</span>
         </Link>
 
-        <div className="flex items-center gap-1">
+        {/* Desktop nav */}
+        <div className="hidden sm:flex items-center gap-1">
           {links.map((link) => (
             <Link
               key={link.href}
@@ -84,7 +84,7 @@ export default function Navbar() {
           ))}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="hidden sm:flex items-center gap-3">
           {user ? (
             <>
               <span className="text-sm text-slate-400">{username}</span>
@@ -98,7 +98,54 @@ export default function Navbar() {
             </Link>
           )}
         </div>
+
+        {/* Mobile hamburger */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="sm:hidden p-1 text-zinc-400 hover:text-white"
+          aria-label="Toggle menu"
+        >
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            {menuOpen ? (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            )}
+          </svg>
+        </button>
       </div>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div className="sm:hidden border-t border-white/10 bg-zinc-950 px-4 py-3 space-y-2">
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMenuOpen(false)}
+              className={`block rounded-lg px-3 py-2 text-sm font-medium ${
+                pathname === link.href
+                  ? "bg-zinc-800 text-white"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+          {user ? (
+            <div className="flex items-center justify-between rounded-lg px-3 py-2">
+              <span className="text-sm text-slate-400">{username}</span>
+              <button onClick={handleLogout} className="text-sm text-slate-500 hover:text-white">
+                Log out
+              </button>
+            </div>
+          ) : (
+            <Link href="/predict" onClick={() => setMenuOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-white">
+              Sign In
+            </Link>
+          )}
+        </div>
+      )}
     </nav>
   );
 }
