@@ -223,7 +223,7 @@ export default function PredictPage() {
       <>
         <Navbar key={authKey} />
         <div className="flex min-h-[60vh] items-center justify-center">
-          <div className="text-lg text-slate-400">Loading...</div>
+          <div className="text-lg text-zinc-500 dark:text-slate-400">Loading...</div>
         </div>
       </>
     );
@@ -235,7 +235,7 @@ export default function PredictPage() {
         <Navbar key={authKey} />
         <div className="mx-auto max-w-7xl px-4 py-12">
           <h1 className="mb-2 text-center text-3xl font-bold">Make Your Predictions</h1>
-          <p className="mb-8 text-center text-slate-400">Sign in to start predicting</p>
+          <p className="mb-8 text-center text-zinc-500 dark:text-slate-400">Sign in to start predicting</p>
           <Auth onAuth={checkUser} />
         </div>
       </>
@@ -265,7 +265,7 @@ export default function PredictPage() {
           )}
         </div>
 
-        <div className="mb-8 flex gap-6 border-b border-white/10 overflow-x-auto">
+        <div className="mb-8 flex gap-6 border-b border-zinc-200 dark:border-white/10 overflow-x-auto">
           {tabItems.map((t) => (
             <button
               key={t.key}
@@ -280,7 +280,7 @@ export default function PredictPage() {
         </div>
 
         {locked && (
-          <div className="mb-6 rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3 text-sm text-zinc-300">
+          <div className="mb-6 rounded-lg border border-zinc-300 bg-zinc-100 px-4 py-3 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-300">
             Predictions are locked. The tournament has started.
           </div>
         )}
@@ -288,7 +288,7 @@ export default function PredictPage() {
         {/* Group Stage */}
         {tab === "groups" && (
           <div className="animate-fade-in">
-            <p className="mb-6 text-slate-400">
+            <p className="mb-6 text-zinc-500 dark:text-slate-400">
               Reorder teams to predict the final standings for each group. Position 1 = group winner.
             </p>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -298,7 +298,7 @@ export default function PredictPage() {
                   group.teams.map((t) => t.code);
                 return (
                   <div key={group.name} className="glass-card p-4">
-                    <h3 className="mb-3 text-sm font-bold text-zinc-400">
+                    <h3 className="mb-3 text-sm font-bold text-zinc-500 dark:text-zinc-400">
                       Group {group.name}
                     </h3>
                     <div className="space-y-2">
@@ -319,7 +319,7 @@ export default function PredictPage() {
                                 <button
                                   onClick={(e) => { e.stopPropagation(); moveTeam(group.name, i, "up"); }}
                                   disabled={i === 0}
-                                  className="text-zinc-500 hover:text-white disabled:opacity-20 p-0.5"
+                                  className="text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-white disabled:opacity-20 p-0.5"
                                   aria-label="Move up"
                                 >
                                   <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
@@ -327,14 +327,14 @@ export default function PredictPage() {
                                 <button
                                   onClick={(e) => { e.stopPropagation(); moveTeam(group.name, i, "down"); }}
                                   disabled={i === order.length - 1}
-                                  className="text-zinc-500 hover:text-white disabled:opacity-20 p-0.5"
+                                  className="text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-white disabled:opacity-20 p-0.5"
                                   aria-label="Move down"
                                 >
                                   <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
                                 </button>
                               </div>
                             )}
-                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold">
+                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-zinc-900/10 dark:bg-white/10 text-xs font-bold">
                               {i + 1}
                             </span>
                             <span className="text-lg">{team.flag}</span>
@@ -363,8 +363,8 @@ export default function PredictPage() {
         {/* Third Place Selection */}
         {tab === "thirdplace" && (
           <div className="animate-fade-in">
-            <p className="mb-2 text-slate-400">
-              Select which <strong className="text-white">8 of 12</strong> third-place teams will advance to the knockout rounds.
+            <p className="mb-2 text-zinc-500 dark:text-slate-400">
+              Select which <strong className="text-zinc-900 dark:text-white">8 of 12</strong> third-place teams will advance to the knockout rounds.
             </p>
             <p className="mb-6 text-sm text-slate-500">
               {predictions.thirdPlaceGroups.length}/8 selected
@@ -386,14 +386,14 @@ export default function PredictPage() {
                     disabled={locked || isFull}
                     className={`glass-card p-4 text-left transition-all ${
                       isSelected
-                        ? "border-zinc-600 bg-zinc-800"
+                        ? "border-zinc-400 bg-zinc-100 dark:border-zinc-600 dark:bg-zinc-800"
                         : isFull
                         ? "opacity-40"
                         : "hover:border-white/20"
                     }`}
                   >
                     <div className="mb-2 flex items-center justify-between">
-                      <span className="text-sm font-bold text-zinc-400">Group {group.name}</span>
+                      <span className="text-sm font-bold text-zinc-500 dark:text-zinc-400">Group {group.name}</span>
                       {isSelected && (
                         <span className="rounded-full bg-zinc-700/50 px-2 py-0.5 text-xs font-bold text-zinc-300">
                           Advances
@@ -401,7 +401,7 @@ export default function PredictPage() {
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-xs font-bold">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-900/10 dark:bg-white/10 text-xs font-bold">
                         3
                       </span>
                       <span className="text-lg">{thirdTeam?.flag || "❓"}</span>
@@ -420,7 +420,7 @@ export default function PredictPage() {
                     const order = predictions.groupPredictions[g] || GROUPS.find(gr => gr.name === g)!.teams.map(t => t.code);
                     const team = ALL_TEAMS.find(t => t.code === order[2]);
                     return (
-                      <div key={g} className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2 text-sm">
+                      <div key={g} className="flex items-center gap-2 rounded-lg bg-zinc-100 dark:bg-white/5 px-3 py-2 text-sm">
                         <span>{team?.flag}</span>
                         <span>{team?.name}</span>
                         <span className="ml-auto text-xs text-slate-500">{THIRD_PLACE_SLOTS[i]?.label}</span>
@@ -436,7 +436,7 @@ export default function PredictPage() {
         {/* Knockout */}
         {tab === "knockout" && (
           <div className="animate-fade-in">
-            <p className="mb-6 text-slate-400">
+            <p className="mb-6 text-zinc-500 dark:text-slate-400">
               Click on the team you think will win each match. Teams are seeded from your group and 3rd-place predictions.
             </p>
             {predictions.thirdPlaceGroups.length < 8 && (
@@ -457,7 +457,7 @@ export default function PredictPage() {
                   <div key={round} className="glass-card overflow-hidden">
                     <button
                       onClick={() => setExpandedRound(isOpen ? "" : round)}
-                      className="flex w-full items-center justify-between px-4 py-3 text-sm font-bold text-zinc-400"
+                      className="flex w-full items-center justify-between px-4 py-3 text-sm font-bold text-zinc-500 dark:text-zinc-400"
                     >
                       {roundLabel} ({matches.length} matches)
                       <svg className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
@@ -495,7 +495,7 @@ export default function PredictPage() {
                   const matches = KNOCKOUT_STRUCTURE.filter((m) => m.round === round);
                   return (
                     <div key={round} className="flex-1">
-                      <h3 className="mb-3 text-center text-sm font-bold text-zinc-400">
+                      <h3 className="mb-3 text-center text-sm font-bold text-zinc-500 dark:text-zinc-400">
                         {round === "R32" ? "Round of 32" : round === "R16" ? "Round of 16" : round === "QF" ? "Quarter-Finals" : round === "SF" ? "Semi-Finals" : "Final"}
                       </h3>
                       <div className="flex flex-col justify-around gap-2" style={{ minHeight: round === "R32" ? "auto" : "100%" }}>
@@ -530,7 +530,7 @@ export default function PredictPage() {
         {/* Extras */}
         {tab === "extras" && (
           <div className="animate-fade-in">
-            <p className="mb-6 text-slate-400">Make your bonus predictions for extra points!</p>
+            <p className="mb-6 text-zinc-500 dark:text-slate-400">Make your bonus predictions for extra points!</p>
             {/* Tournament winner derived from knockout bracket */}
             {(() => {
               const finalWinner = predictions.knockoutPredictions["final"];
@@ -539,7 +539,7 @@ export default function PredictPage() {
                 <div className="mb-6 glass-card p-6">
                   <h3 className="mb-1 text-lg font-bold">Your Predicted Winner</h3>
                   <p className="mb-3 text-xs text-slate-500">+6 points if correct — set by your knockout bracket picks</p>
-                  <div className="flex items-center gap-3 rounded-lg bg-white/5 px-4 py-3">
+                  <div className="flex items-center gap-3 rounded-lg bg-zinc-100 dark:bg-white/5 px-4 py-3">
                     <span className="text-2xl">{display.flag}</span>
                     <span className="text-lg font-semibold">{finalWinner ? display.name : "Complete your knockout bracket to set this"}</span>
                   </div>
@@ -555,7 +555,7 @@ export default function PredictPage() {
                   value={predictions.topScorer}
                   onChange={(e) => setPredictions((p) => ({ ...p, topScorer: e.target.value }))}
                   disabled={locked}
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500 disabled:opacity-50"
+                  className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-zinc-900 outline-none focus:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-white dark:focus:border-zinc-500 disabled:opacity-50"
                   placeholder="e.g. Kylian Mbappé"
                 />
               </div>
@@ -567,7 +567,7 @@ export default function PredictPage() {
                   value={predictions.topAssister}
                   onChange={(e) => setPredictions((p) => ({ ...p, topAssister: e.target.value }))}
                   disabled={locked}
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500 disabled:opacity-50"
+                  className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-zinc-900 outline-none focus:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-white dark:focus:border-zinc-500 disabled:opacity-50"
                   placeholder="e.g. Kevin De Bruyne"
                 />
               </div>
@@ -579,7 +579,7 @@ export default function PredictPage() {
                   value={predictions.bestPlayer}
                   onChange={(e) => setPredictions((p) => ({ ...p, bestPlayer: e.target.value }))}
                   disabled={locked}
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500 disabled:opacity-50"
+                  className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-zinc-900 outline-none focus:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-white dark:focus:border-zinc-500 disabled:opacity-50"
                   placeholder="e.g. Lionel Messi"
                 />
               </div>
@@ -598,8 +598,8 @@ export default function PredictPage() {
                   ["Top assister", "+2 pts", "text-zinc-300"],
                   ["Best player", "+3 pts", "text-zinc-300"],
                 ].map(([label, pts, color]) => (
-                  <div key={label} className="flex justify-between rounded-lg bg-white/5 px-4 py-2">
-                    <span className="text-slate-400">{label}</span>
+                  <div key={label} className="flex justify-between rounded-lg bg-zinc-100 dark:bg-white/5 px-4 py-2">
+                    <span className="text-zinc-500 dark:text-slate-400">{label}</span>
                     <span className={`font-bold ${color}`}>{pts}</span>
                   </div>
                 ))}

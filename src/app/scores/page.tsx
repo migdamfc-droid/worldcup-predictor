@@ -90,7 +90,7 @@ export default function ScoresPage() {
                           <span className="text-sm font-medium truncate">{home.name}</span>
                           <span className="text-lg">{home.flag}</span>
                         </div>
-                        <div className="flex items-center gap-1 rounded-lg bg-zinc-800 px-3 py-1">
+                        <div className="flex items-center gap-1 rounded-lg bg-zinc-200 dark:bg-zinc-800 px-3 py-1">
                           <span className="text-lg font-bold tabular-nums">{m.intHomeScore}</span>
                           <span className="text-zinc-500">-</span>
                           <span className="text-lg font-bold tabular-nums">{m.intAwayScore}</span>
@@ -123,7 +123,7 @@ export default function ScoresPage() {
                           <span className="text-sm font-medium truncate">{home.name}</span>
                           <span className="text-lg">{home.flag}</span>
                         </div>
-                        <div className="flex items-center rounded-lg bg-zinc-800 px-3 py-1">
+                        <div className="flex items-center rounded-lg bg-zinc-200 dark:bg-zinc-800 px-3 py-1">
                           <span className="text-xs text-zinc-400">{dateStr}</span>
                         </div>
                         <div className="flex flex-1 items-center gap-2">

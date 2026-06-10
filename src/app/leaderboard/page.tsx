@@ -245,7 +245,7 @@ export default function LeaderboardPage() {
         </div>
 
         {/* Tabs */}
-        <div className="mb-6 flex gap-1 overflow-x-auto border-b border-zinc-800 pb-px">
+        <div className="mb-6 flex gap-1 overflow-x-auto border-b border-zinc-200 dark:border-zinc-800 pb-px">
           <button
             onClick={() => setActiveTab("global")}
             className={`whitespace-nowrap px-4 py-2 text-sm font-medium ${
@@ -269,13 +269,13 @@ export default function LeaderboardPage() {
 
         {/* League info bar */}
         {activeLeague && (
-          <div className="mb-6 flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-3">
-            <div className="text-sm text-zinc-400">
-              Invite code: <span className="font-mono font-semibold text-white">{activeLeague.code}</span>
+          <div className="mb-6 flex items-center justify-between rounded-lg border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/50 px-4 py-3">
+            <div className="text-sm text-zinc-500 dark:text-zinc-400">
+              Invite code: <span className="font-mono font-semibold text-zinc-900 dark:text-white">{activeLeague.code}</span>
             </div>
             <button
               onClick={() => copyCode(activeLeague.code, activeLeague.id)}
-              className="text-sm text-zinc-400 hover:text-white"
+              className="text-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
             >
               {copiedLeagueId === activeLeague.id ? "Copied!" : "Copy"}
             </button>
@@ -306,14 +306,14 @@ export default function LeaderboardPage() {
                 }`}
               >
                 <div className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold ${
-                  i === 0 ? "bg-white/15 text-white" :
-                  i === 1 ? "bg-zinc-700/50 text-zinc-300" :
-                  i === 2 ? "bg-zinc-800 text-zinc-400" :
-                  "bg-zinc-900 text-zinc-500"
+                  i === 0 ? "bg-zinc-900/15 text-zinc-900 dark:bg-white/15 dark:text-white" :
+                  i === 1 ? "bg-zinc-300/50 text-zinc-600 dark:bg-zinc-700/50 dark:text-zinc-300" :
+                  i === 2 ? "bg-zinc-200 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400" :
+                  "bg-zinc-100 text-zinc-400 dark:bg-zinc-900 dark:text-zinc-500"
                 }`}>
                   {i + 1}
                 </div>
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-bold text-zinc-400">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-xs font-bold text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
                   {entry.username.slice(0, 2).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -325,7 +325,7 @@ export default function LeaderboardPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-white">{entry.total}</div>
+                  <div className="text-2xl font-bold text-zinc-900 dark:text-white">{entry.total}</div>
                   <div className="text-xs text-zinc-500">points</div>
                 </div>
               </div>
@@ -349,13 +349,13 @@ export default function LeaderboardPage() {
       {/* Create League Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowCreateModal(false)}>
-          <div className="w-full max-w-sm rounded-xl border border-zinc-800 bg-zinc-950 p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 p-6" onClick={(e) => e.stopPropagation()}>
             <h2 className="mb-4 text-lg font-bold">Create a League</h2>
             <input
               type="text"
               value={newLeagueName}
               onChange={(e) => setNewLeagueName(e.target.value)}
-              className="mb-4 w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500"
+              className="mb-4 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-zinc-900 outline-none focus:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-white dark:focus:border-zinc-500"
               placeholder="League name"
               autoFocus
             />
@@ -373,7 +373,7 @@ export default function LeaderboardPage() {
       {/* Join League Modal */}
       {showJoinModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowJoinModal(false)}>
-          <div className="w-full max-w-sm rounded-xl border border-zinc-800 bg-zinc-950 p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 p-6" onClick={(e) => e.stopPropagation()}>
             <h2 className="mb-4 text-lg font-bold">Join a League</h2>
             <input
               type="text"

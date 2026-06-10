@@ -51,35 +51,35 @@ export default function Auth({ onAuth }: { onAuth: () => void }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
             <div>
-              <label className="mb-1 block text-sm text-slate-400">Display Name</label>
+              <label className="mb-1 block text-sm text-zinc-500 dark:text-slate-400">Display Name</label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsernameInput(e.target.value)}
-                className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500"
+                className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-zinc-900 outline-none focus:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-white dark:focus:border-zinc-500"
                 placeholder="Your name"
                 required
               />
             </div>
           )}
           <div>
-            <label className="mb-1 block text-sm text-slate-400">Email</label>
+            <label className="mb-1 block text-sm text-zinc-500 dark:text-slate-400">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500"
+              className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-zinc-900 outline-none focus:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-white dark:focus:border-zinc-500"
               placeholder="you@example.com"
               required
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm text-slate-400">Password</label>
+            <label className="mb-1 block text-sm text-zinc-500 dark:text-slate-400">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-white outline-none focus:border-zinc-500"
+              className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-zinc-900 outline-none focus:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-white dark:focus:border-zinc-500"
               placeholder="••••••••"
               minLength={6}
               required
@@ -99,7 +99,7 @@ export default function Auth({ onAuth }: { onAuth: () => void }) {
           {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
           <button
             onClick={() => { setIsLogin(!isLogin); setError(""); }}
-            className="text-zinc-400 hover:text-zinc-300"
+            className="text-zinc-600 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-300"
           >
             {isLogin ? "Sign up" : "Sign in"}
           </button>

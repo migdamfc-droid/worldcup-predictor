@@ -79,7 +79,7 @@ export default function ComparePage() {
               <select
                 value={userA}
                 onChange={(e) => setUserA(e.target.value)}
-                className="rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-white outline-none"
+                className="rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-zinc-900 outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white"
               >
                 {users.map((u) => (
                   <option key={u.userId} value={u.userId}>{u.username}</option>
@@ -88,7 +88,7 @@ export default function ComparePage() {
               <select
                 value={userB}
                 onChange={(e) => setUserB(e.target.value)}
-                className="rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-white outline-none"
+                className="rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-zinc-900 outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white"
               >
                 {users.map((u) => (
                   <option key={u.userId} value={u.userId}>{u.username}</option>
@@ -106,7 +106,7 @@ export default function ComparePage() {
                     const same = aWinner === bWinner;
                     return (
                       <div key={group.name} className="glass-card flex items-center px-4 py-3">
-                        <span className="w-16 text-sm font-bold text-zinc-400">Group {group.name}</span>
+                        <span className="w-16 text-sm font-bold text-zinc-500 dark:text-zinc-400">Group {group.name}</span>
                         <div className={`flex-1 text-center text-sm ${same ? "text-zinc-300" : "text-white font-semibold"}`}>
                           {getFlag(aWinner)} {getName(aWinner)}
                         </div>

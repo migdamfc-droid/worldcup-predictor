@@ -160,7 +160,7 @@ export default function ViewPredictionsPage() {
           <div>
             <h1 className="text-2xl font-bold">{username}&apos;s Predictions</h1>
             <p className="text-sm text-zinc-500">View only</p>
-            <button onClick={shareLink} className="mt-1 text-xs text-zinc-400 hover:text-white">
+            <button onClick={shareLink} className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 hover:text-white">
               {copied ? "Link copied!" : "Share"}
             </button>
           </div>
@@ -171,16 +171,16 @@ export default function ViewPredictionsPage() {
                 <div className="text-[10px] text-zinc-500 uppercase">Total</div>
               </div>
               <div className="h-8 w-px bg-zinc-800" />
-              <div className="flex gap-4 text-xs text-zinc-400">
-                <div className="text-center"><div className="font-semibold text-white">{score.groupPoints}</div>Groups</div>
-                <div className="text-center"><div className="font-semibold text-white">{score.knockoutPoints}</div>Knockout</div>
-                <div className="text-center"><div className="font-semibold text-white">{score.bonusPoints}</div>Bonus</div>
+              <div className="flex gap-4 text-xs text-zinc-500 dark:text-zinc-400">
+                <div className="text-center"><div className="font-semibold text-zinc-900 dark:text-white">{score.groupPoints}</div>Groups</div>
+                <div className="text-center"><div className="font-semibold text-zinc-900 dark:text-white">{score.knockoutPoints}</div>Knockout</div>
+                <div className="text-center"><div className="font-semibold text-zinc-900 dark:text-white">{score.bonusPoints}</div>Bonus</div>
               </div>
             </div>
           )}
         </div>
 
-        <div className="mb-8 flex gap-6 border-b border-zinc-800 overflow-x-auto">
+        <div className="mb-8 flex gap-6 border-b border-zinc-200 dark:border-zinc-800 overflow-x-auto">
           {tabItems.map((t) => (
             <button
               key={t.key}
@@ -201,13 +201,13 @@ export default function ViewPredictionsPage() {
                 const order = predictions.groupPredictions[group.name] || group.teams.map((t) => t.code);
                 return (
                   <div key={group.name} className="glass-card p-4">
-                    <h3 className="mb-3 text-sm font-bold text-zinc-400">Group {group.name}</h3>
+                    <h3 className="mb-3 text-sm font-bold text-zinc-500 dark:text-zinc-400">Group {group.name}</h3>
                     <div className="space-y-2">
                       {order.map((code, i) => {
                         const team = group.teams.find((t) => t.code === code);
                         if (!team) return null;
                         return (
-                          <div key={code} className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm">
+                          <div key={code} className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50 px-3 py-2 text-sm">
                             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-xs font-bold">{i + 1}</span>
                             <span className="text-lg">{team.flag}</span>
                             <span className="font-medium">{team.name}</span>
@@ -236,7 +236,7 @@ export default function ViewPredictionsPage() {
                   const matches = KNOCKOUT_STRUCTURE.filter((m) => m.round === round);
                   return (
                     <div key={round} className="flex-1">
-                      <h3 className="mb-3 text-center text-sm font-bold text-zinc-400">
+                      <h3 className="mb-3 text-center text-sm font-bold text-zinc-500 dark:text-zinc-400">
                         {round === "R32" ? "Round of 32" : round === "R16" ? "Round of 16" : round === "QF" ? "Quarter-Finals" : round === "SF" ? "Semi-Finals" : "Final"}
                       </h3>
                       <div className="flex flex-col justify-around gap-2" style={{ minHeight: round === "R32" ? "auto" : "100%" }}>
@@ -250,11 +250,11 @@ export default function ViewPredictionsPage() {
                           return (
                             <div key={match.id} className="glass-card p-2">
                               <div className="space-y-1">
-                                <div className={`rounded-lg border px-3 py-2 text-sm ${winner === teamA && teamA ? "border-zinc-500 bg-zinc-800 text-white" : "border-zinc-800 bg-zinc-900/50"}`}>
+                                <div className={`rounded-lg border px-3 py-2 text-sm ${winner === teamA && teamA ? "border-zinc-400 bg-zinc-100 text-zinc-900 dark:border-zinc-500 dark:bg-zinc-800 dark:text-white" : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50"}`}>
                                   <span className="mr-2">{displayA.flag}</span>
                                   <span className="text-xs">{displayA.name}</span>
                                 </div>
-                                <div className={`rounded-lg border px-3 py-2 text-sm ${winner === teamB && teamB ? "border-zinc-500 bg-zinc-800 text-white" : "border-zinc-800 bg-zinc-900/50"}`}>
+                                <div className={`rounded-lg border px-3 py-2 text-sm ${winner === teamB && teamB ? "border-zinc-400 bg-zinc-100 text-zinc-900 dark:border-zinc-500 dark:bg-zinc-800 dark:text-white" : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50"}`}>
                                   <span className="mr-2">{displayB.flag}</span>
                                   <span className="text-xs">{displayB.name}</span>
                                 </div>
@@ -275,7 +275,7 @@ export default function ViewPredictionsPage() {
           <div className="animate-fade-in">
             <div className="mb-6 glass-card p-6">
               <h3 className="mb-1 text-lg font-bold">Predicted Winner</h3>
-              <div className="flex items-center gap-3 rounded-lg bg-white/5 px-4 py-3">
+              <div className="flex items-center gap-3 rounded-lg bg-zinc-100 dark:bg-white/5 px-4 py-3">
                 <span className="text-2xl">{winnerDisplay.flag}</span>
                 <span className="text-lg font-semibold">{finalWinner ? winnerDisplay.name : "Not set"}</span>
               </div>
@@ -287,7 +287,7 @@ export default function ViewPredictionsPage() {
                 ["Best Player", predictions.bestPlayer],
               ].map(([label, value]) => (
                 <div key={label} className="glass-card p-6">
-                  <h3 className="mb-2 text-sm font-bold text-zinc-400">{label}</h3>
+                  <h3 className="mb-2 text-sm font-bold text-zinc-500 dark:text-zinc-400">{label}</h3>
                   <p className="text-lg font-semibold">{value || "Not set"}</p>
                 </div>
               ))}
