@@ -1,23 +1,63 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
+
+function Countdown() {
+  const target = new Date("2026-06-11T20:00:00Z");
+  const [diff, setDiff] = useState(() => target.getTime() - Date.now());
+
+  useEffect(() => {
+    const id = setInterval(() => setDiff(target.getTime() - Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  if (diff <= 0) return <p className="text-sm text-zinc-400">The tournament has started!</p>;
+
+  const days = Math.floor(diff / 86400000);
+  const hrs = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+
+  return (
+    <div className="flex justify-center gap-3 sm:gap-5">
+      {[
+        [days, "Days"],
+        [hrs, "Hours"],
+        [mins, "Min"],
+        [secs, "Sec"],
+      ].map(([val, label]) => (
+        <div key={label as string} className="flex flex-col items-center">
+          <span className="text-2xl font-bold tabular-nums sm:text-3xl">{String(val).padStart(2, "0")}</span>
+          <span className="text-[10px] uppercase tracking-wider text-zinc-500">{label as string}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function HomePage() {
   return (
     <>
       <Navbar />
-      <div className="mx-auto max-w-4xl px-4 py-24 text-center">
+      <div className="mx-auto max-w-4xl px-4 py-16 sm:py-24 text-center">
         <p className="mb-4 text-sm font-medium uppercase tracking-widest text-zinc-400">
           FIFA World Cup 2026
         </p>
         <h1 className="mb-5 text-4xl font-bold tracking-tight sm:text-5xl">
           Bracket Predictor
         </h1>
-        <p className="mx-auto mb-10 max-w-lg text-base text-slate-400">
+        <p className="mx-auto mb-8 max-w-lg text-base text-slate-400">
           Predict group standings, knockout results, and individual awards.
           Compete with friends on a live leaderboard.
         </p>
+
+        <div className="mb-10 glass-card inline-block px-8 py-5">
+          <p className="mb-3 text-xs uppercase tracking-widest text-zinc-500">Predictions lock in</p>
+          <Countdown />
+        </div>
+
         <div className="flex justify-center gap-4">
           <Link href="/predict" className="btn-primary">
             Start Predicting

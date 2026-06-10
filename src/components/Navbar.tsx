@@ -55,6 +55,8 @@ export default function Navbar() {
     { href: "/", label: "Home" },
     { href: "/predict", label: "Predict" },
     { href: "/leaderboard", label: "Leaderboard" },
+    { href: "/scores", label: "Scores" },
+    { href: "/compare", label: "Compare" },
   ];
 
   return (

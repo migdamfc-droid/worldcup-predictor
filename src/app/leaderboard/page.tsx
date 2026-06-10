@@ -5,6 +5,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { calculateScore, type Predictions, type ActualResults } from "@/lib/scoring";
 import Navbar from "@/components/Navbar";
+import { SkeletonRow } from "@/components/Skeleton";
 
 interface LeaderboardEntry {
   userId: string;
@@ -282,7 +283,7 @@ export default function LeaderboardPage() {
         )}
 
         {loading ? (
-          <div className="text-center text-zinc-500">Loading...</div>
+          <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}</div>
         ) : filteredEntries.length === 0 ? (
           <div className="glass-card p-12 text-center">
             <svg className="mx-auto mb-4 h-10 w-10 text-zinc-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -312,8 +313,11 @@ export default function LeaderboardPage() {
                 }`}>
                   {i + 1}
                 </div>
-                <div className="flex-1">
-                  <Link href={`/predictions/${entry.userId}`} className="font-semibold hover:underline">{entry.username}</Link>
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-bold text-zinc-400">
+                  {entry.username.slice(0, 2).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <Link href={`/predictions/${entry.userId}`} className="font-semibold hover:underline truncate block">{entry.username}</Link>
                   <div className="flex gap-3 text-xs text-zinc-500">
                     <span>Groups: {entry.groupPoints}</span>
                     <span>Knockout: {entry.knockoutPoints}</span>
@@ -326,6 +330,18 @@ export default function LeaderboardPage() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+        {/* Quick Links */}
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/scores" className="btn-secondary text-sm">Live Scores</Link>
+          <Link href="/compare" className="btn-secondary text-sm">Head to Head</Link>
+        </div>
+
+        {/* Stats */}
+        {allEntries.length > 0 && activeTab === "global" && (
+          <div className="mt-10 text-sm text-zinc-500">
+            {allEntries.length} prediction{allEntries.length !== 1 ? "s" : ""} submitted
           </div>
         )}
       </div>

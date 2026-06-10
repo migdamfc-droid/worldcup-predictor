@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { GROUPS, KNOCKOUT_STRUCTURE, ALL_TEAMS } from "@/lib/teams";
+import { calculateScore, type Predictions, type ActualResults } from "@/lib/scoring";
 import Navbar from "@/components/Navbar";
 
 type Tab = "groups" | "knockout" | "extras";
@@ -28,27 +29,63 @@ export default function ViewPredictionsPage() {
   const [predictions, setPredictions] = useState<PredictionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("groups");
+  const [score, setScore] = useState<{ total: number; groupPoints: number; knockoutPoints: number; bonusPoints: number } | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const shareLink = () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      navigator.share({ title: `${username}'s WC 2026 Predictions`, url });
+    } else {
+      navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   useEffect(() => {
     loadPredictions();
   }, [userId]);
 
   const loadPredictions = async () => {
-    const [{ data: profile }, { data: pred }] = await Promise.all([
+    const [{ data: profile }, { data: pred }, { data: resultsRow }] = await Promise.all([
       supabase.from("profiles").select("username").eq("id", userId).single(),
       supabase.from("predictions").select("*").eq("user_id", userId).single(),
+      supabase.from("actual_results").select("*").eq("id", 1).single(),
     ]);
 
     if (profile) setUsername(profile.username);
     if (pred) {
-      setPredictions({
+      const predData: PredictionData = {
         groupPredictions: { ...defaultGroupPredictions, ...(pred.group_predictions || {}) },
         thirdPlaceGroups: pred.knockout_predictions?._thirdPlaceGroups || [],
         knockoutPredictions: pred.knockout_predictions || {},
         topScorer: pred.top_scorer || "",
         topAssister: pred.top_assister || "",
         bestPlayer: pred.best_player || "",
-      });
+      };
+      setPredictions(predData);
+
+      if (resultsRow) {
+        const actual: ActualResults = {
+          group_results: resultsRow.group_results || {},
+          knockout_results: resultsRow.knockout_results || {},
+          tournament_winner: resultsRow.tournament_winner || "",
+          top_scorer: resultsRow.top_scorer || "",
+          top_assister: resultsRow.top_assister || "",
+          best_player: resultsRow.best_player || "",
+        };
+        const p: Predictions = {
+          group_predictions: predData.groupPredictions,
+          knockout_predictions: predData.knockoutPredictions,
+          tournament_winner: predData.knockoutPredictions["final"] || "",
+          top_scorer: predData.topScorer,
+          top_assister: predData.topAssister,
+          best_player: predData.bestPlayer,
+        };
+        const s = calculateScore(p, actual);
+        if (s.total > 0) setScore(s);
+      }
     }
     setLoading(false);
   };
@@ -119,9 +156,28 @@ export default function ViewPredictionsPage() {
     <>
       <Navbar />
       <div className="mx-auto max-w-7xl px-4 py-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold">{username}&apos;s Predictions</h1>
-          <p className="text-sm text-zinc-500">View only</p>
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">{username}&apos;s Predictions</h1>
+            <p className="text-sm text-zinc-500">View only</p>
+            <button onClick={shareLink} className="mt-1 text-xs text-zinc-400 hover:text-white">
+              {copied ? "Link copied!" : "Share"}
+            </button>
+          </div>
+          {score && (
+            <div className="glass-card flex items-center gap-4 px-5 py-3">
+              <div className="text-center">
+                <div className="text-2xl font-bold">{score.total}</div>
+                <div className="text-[10px] text-zinc-500 uppercase">Total</div>
+              </div>
+              <div className="h-8 w-px bg-zinc-800" />
+              <div className="flex gap-4 text-xs text-zinc-400">
+                <div className="text-center"><div className="font-semibold text-white">{score.groupPoints}</div>Groups</div>
+                <div className="text-center"><div className="font-semibold text-white">{score.knockoutPoints}</div>Knockout</div>
+                <div className="text-center"><div className="font-semibold text-white">{score.bonusPoints}</div>Bonus</div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="mb-8 flex gap-6 border-b border-zinc-800 overflow-x-auto">

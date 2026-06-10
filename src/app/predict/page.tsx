@@ -55,6 +55,7 @@ export default function PredictPage() {
   const [saveMsg, setSaveMsg] = useState("");
   const [dragState, setDragState] = useState<{ group: string; index: number } | null>(null);
   const [authKey, setAuthKey] = useState(0);
+  const [expandedRound, setExpandedRound] = useState<string>("R32");
   const locked = new Date() >= LOCKOUT_DATE;
 
   const checkUser = useCallback(async () => {
@@ -446,22 +447,56 @@ export default function PredictPage() {
                 </button>
               </div>
             )}
-            <div className="overflow-x-auto pb-4">
+            {/* Mobile: collapsible rounds */}
+            <div className="sm:hidden space-y-3">
+              {["R32", "R16", "QF", "SF", "Final"].map((round) => {
+                const roundLabel = round === "R32" ? "Round of 32" : round === "R16" ? "Round of 16" : round === "QF" ? "Quarter-Finals" : round === "SF" ? "Semi-Finals" : "Final";
+                const matches = KNOCKOUT_STRUCTURE.filter((m) => m.round === round);
+                const isOpen = expandedRound === round;
+                return (
+                  <div key={round} className="glass-card overflow-hidden">
+                    <button
+                      onClick={() => setExpandedRound(isOpen ? "" : round)}
+                      className="flex w-full items-center justify-between px-4 py-3 text-sm font-bold text-zinc-400"
+                    >
+                      {roundLabel} ({matches.length} matches)
+                      <svg className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                    </button>
+                    {isOpen && (
+                      <div className="space-y-2 px-4 pb-4">
+                        {matches.map((match) => {
+                          const teamA = resolveTeam(predictions.knockoutPredictions, match.seedA);
+                          const teamB = resolveTeam(predictions.knockoutPredictions, match.seedB);
+                          const displayA = getTeamDisplay(teamA);
+                          const displayB = getTeamDisplay(teamB);
+                          const winner = predictions.knockoutPredictions[match.id];
+                          return (
+                            <div key={match.id} className="space-y-1">
+                              <button onClick={() => !locked && teamA && setKnockoutWinner(match.id, teamA)} disabled={locked || !teamA} className={`w-full text-left ${winner === teamA && teamA ? "knockout-team-winner" : "knockout-team"}`}>
+                                <span className="mr-2">{displayA.flag}</span><span className="text-xs">{displayA.name}</span>
+                              </button>
+                              <button onClick={() => !locked && teamB && setKnockoutWinner(match.id, teamB)} disabled={locked || !teamB} className={`w-full text-left ${winner === teamB && teamB ? "knockout-team-winner" : "knockout-team"}`}>
+                                <span className="mr-2">{displayB.flag}</span><span className="text-xs">{displayB.name}</span>
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop: horizontal bracket */}
+            <div className="hidden sm:block overflow-x-auto pb-4">
               <div className="flex min-w-[1200px] gap-4">
                 {["R32", "R16", "QF", "SF", "Final"].map((round) => {
                   const matches = KNOCKOUT_STRUCTURE.filter((m) => m.round === round);
                   return (
                     <div key={round} className="flex-1">
                       <h3 className="mb-3 text-center text-sm font-bold text-zinc-400">
-                        {round === "R32"
-                          ? "Round of 32"
-                          : round === "R16"
-                          ? "Round of 16"
-                          : round === "QF"
-                          ? "Quarter-Finals"
-                          : round === "SF"
-                          ? "Semi-Finals"
-                          : "Final"}
+                        {round === "R32" ? "Round of 32" : round === "R16" ? "Round of 16" : round === "QF" ? "Quarter-Finals" : round === "SF" ? "Semi-Finals" : "Final"}
                       </h3>
                       <div className="flex flex-col justify-around gap-2" style={{ minHeight: round === "R32" ? "auto" : "100%" }}>
                         {matches.map((match) => {
@@ -470,29 +505,14 @@ export default function PredictPage() {
                           const displayA = getTeamDisplay(teamA);
                           const displayB = getTeamDisplay(teamB);
                           const winner = predictions.knockoutPredictions[match.id];
-
                           return (
                             <div key={match.id} className="glass-card p-2">
                               <div className="space-y-1">
-                                <button
-                                  onClick={() => !locked && teamA && setKnockoutWinner(match.id, teamA)}
-                                  disabled={locked || !teamA}
-                                  className={`w-full text-left ${
-                                    winner === teamA && teamA ? "knockout-team-winner" : "knockout-team"
-                                  }`}
-                                >
-                                  <span className="mr-2">{displayA.flag}</span>
-                                  <span className="text-xs">{displayA.name}</span>
+                                <button onClick={() => !locked && teamA && setKnockoutWinner(match.id, teamA)} disabled={locked || !teamA} className={`w-full text-left ${winner === teamA && teamA ? "knockout-team-winner" : "knockout-team"}`}>
+                                  <span className="mr-2">{displayA.flag}</span><span className="text-xs">{displayA.name}</span>
                                 </button>
-                                <button
-                                  onClick={() => !locked && teamB && setKnockoutWinner(match.id, teamB)}
-                                  disabled={locked || !teamB}
-                                  className={`w-full text-left ${
-                                    winner === teamB && teamB ? "knockout-team-winner" : "knockout-team"
-                                  }`}
-                                >
-                                  <span className="mr-2">{displayB.flag}</span>
-                                  <span className="text-xs">{displayB.name}</span>
+                                <button onClick={() => !locked && teamB && setKnockoutWinner(match.id, teamB)} disabled={locked || !teamB} className={`w-full text-left ${winner === teamB && teamB ? "knockout-team-winner" : "knockout-team"}`}>
+                                  <span className="mr-2">{displayB.flag}</span><span className="text-xs">{displayB.name}</span>
                                 </button>
                               </div>
                             </div>
