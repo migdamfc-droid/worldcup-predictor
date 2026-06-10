@@ -335,7 +335,6 @@ export default function LeaderboardPage() {
         {/* Quick Links */}
         <div className="mt-8 flex flex-wrap gap-3">
           <Link href="/scores" className="btn-secondary text-sm">Live Scores</Link>
-          <Link href="/compare" className="btn-secondary text-sm">Head to Head</Link>
         </div>
 
         {/* Stats */}
