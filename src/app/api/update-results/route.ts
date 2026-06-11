@@ -121,9 +121,25 @@ export async function GET(request: Request) {
       }
     }
 
-    // Sort each group by pts, then gd, then gf
+    // Count finished matches per group
+    const groupMatchCount: Record<string, number> = {};
+    for (const group of Object.keys(GROUP_TEAMS)) {
+      groupMatchCount[group] = 0;
+    }
+    for (const match of finishedMatches) {
+      const homeCode = resolveCode(match.strHomeTeam);
+      const awayCode = resolveCode(match.strAwayTeam);
+      if (!homeCode || !awayCode) continue;
+      const homeGroup = findGroup(homeCode);
+      const awayGroup = findGroup(awayCode);
+      if (!homeGroup || homeGroup !== awayGroup) continue;
+      groupMatchCount[homeGroup]++;
+    }
+
+    // Sort each group by pts, then gd, then gf — only include groups where all 6 matches are done
     const groupResults: Record<string, string[]> = {};
     for (const [group, teams] of Object.entries(groupPoints)) {
+      if (groupMatchCount[group] < 6) continue; // 4 teams = 6 matches per group
       const sorted = Object.entries(teams)
         .sort(([, a], [, b]) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf)
         .map(([code]) => code);
