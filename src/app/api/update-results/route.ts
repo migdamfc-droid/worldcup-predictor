@@ -197,13 +197,22 @@ export async function GET(request: Request) {
       tournamentWinner = knockoutResults["final"];
     }
 
-    // Update Supabase
+    // Merge with existing results so manual entries aren't overwritten
+    const { data: existing } = await supabase
+      .from("actual_results")
+      .select("group_results, knockout_results")
+      .eq("id", 1)
+      .single();
+
+    const mergedGroups = { ...(existing?.group_results || {}), ...groupResults };
+    const mergedKnockout = { ...(existing?.knockout_results || {}), ...knockoutResults };
+
     await supabase
       .from("actual_results")
       .update({
-        group_results: groupResults,
-        knockout_results: knockoutResults,
-        tournament_winner: tournamentWinner,
+        group_results: mergedGroups,
+        knockout_results: mergedKnockout,
+        tournament_winner: tournamentWinner || existing?.tournament_winner || "",
         updated_at: new Date().toISOString(),
       })
       .eq("id", 1);
