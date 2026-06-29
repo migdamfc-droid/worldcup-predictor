@@ -30,6 +30,7 @@ export default function ViewPredictionsPage() {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("groups");
   const [score, setScore] = useState<{ total: number; groupPoints: number; knockoutPoints: number; bonusPoints: number } | null>(null);
+  const [actualGroupResults, setActualGroupResults] = useState<Record<string, string[]>>({});
   const [copied, setCopied] = useState(false);
 
   const shareLink = () => {
@@ -75,6 +76,7 @@ export default function ViewPredictionsPage() {
           top_assister: resultsRow.top_assister || "",
           best_player: resultsRow.best_player || "",
         };
+        setActualGroupResults(actual.group_results);
         const p: Predictions = {
           group_predictions: predData.groupPredictions,
           knockout_predictions: predData.knockoutPredictions,
@@ -199,24 +201,50 @@ export default function ViewPredictionsPage() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {GROUPS.map((group) => {
                 const order = predictions.groupPredictions[group.name] || group.teams.map((t) => t.code);
+                const actualOrder = actualGroupResults[group.name];
+                const hasResults = actualOrder && actualOrder.length === 4;
+                const groupCorrect = hasResults ? order.filter((code, i) => code === actualOrder[i]).length : 0;
                 return (
                   <div key={group.name} className="glass-card p-4">
-                    <h3 className="mb-3 text-sm font-bold text-zinc-500 dark:text-zinc-400">Group {group.name}</h3>
+                    <div className="mb-3 flex items-center justify-between">
+                      <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400">Group {group.name}</h3>
+                      {hasResults && (
+                        <span className={`text-xs font-semibold ${groupCorrect === 4 ? "text-emerald-500" : groupCorrect >= 2 ? "text-orange-400" : "text-zinc-400"}`}>
+                          {groupCorrect}/4
+                        </span>
+                      )}
+                    </div>
                     <div className="space-y-2">
                       {order.map((code, i) => {
                         const team = group.teams.find((t) => t.code === code);
                         if (!team) return null;
+                        const isCorrect = hasResults && code === actualOrder[i];
+                        const actualPos = hasResults ? actualOrder.indexOf(code) + 1 : null;
                         return (
-                          <div key={code} className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50 px-3 py-2 text-sm">
-                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-xs font-bold">{i + 1}</span>
+                          <div key={code} className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm ${
+                            hasResults
+                              ? isCorrect
+                                ? "border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-500/10"
+                                : "border-red-500/20 bg-red-500/5 dark:bg-red-500/10"
+                              : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50"
+                          }`}>
+                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-900/10 dark:bg-white/10 text-xs font-bold">{i + 1}</span>
                             <span className="text-lg">{team.flag}</span>
                             <span className="font-medium">{team.name}</span>
-                            {i < 2 && (
-                              <span className="ml-auto rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-400">Qualifies</span>
-                            )}
-                            {i === 2 && (
-                              <span className="ml-auto rounded-full bg-orange-500/15 px-2 py-0.5 text-xs text-orange-400">Possible</span>
-                            )}
+                            <span className="ml-auto flex items-center gap-1.5">
+                              {hasResults ? (
+                                isCorrect ? (
+                                  <span className="text-emerald-500 text-sm">✓</span>
+                                ) : (
+                                  <span className="text-xs text-red-400">✗ was {actualPos}{actualPos === 1 ? "st" : actualPos === 2 ? "nd" : actualPos === 3 ? "rd" : "th"}</span>
+                                )
+                              ) : (
+                                <>
+                                  {i < 2 && <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-400">Qualifies</span>}
+                                  {i === 2 && <span className="rounded-full bg-orange-500/15 px-2 py-0.5 text-xs text-orange-400">Possible</span>}
+                                </>
+                              )}
+                            </span>
                           </div>
                         );
                       })}
