@@ -56,6 +56,7 @@ export default function PredictPage() {
   const [dragState, setDragState] = useState<{ group: string; index: number } | null>(null);
   const [authKey, setAuthKey] = useState(0);
   const [expandedRound, setExpandedRound] = useState<string>("R32");
+  const [actualGroupResults, setActualGroupResults] = useState<Record<string, string[]>>({});
   const locked = new Date() >= LOCKOUT_DATE;
 
   const checkUser = useCallback(async () => {
@@ -79,6 +80,10 @@ export default function PredictPage() {
         });
       }
     }
+    // Fetch actual results for tick/cross display
+    const { data: resultsRow } = await supabase.from("actual_results").select("group_results").eq("id", 1).single();
+    if (resultsRow?.group_results) setActualGroupResults(resultsRow.group_results);
+
     setLoading(false);
     setAuthKey((k) => k + 1);
   }, []);
@@ -296,15 +301,27 @@ export default function PredictPage() {
                 const order =
                   predictions.groupPredictions[group.name] ||
                   group.teams.map((t) => t.code);
+                const actualOrder = actualGroupResults[group.name];
+                const hasResults = actualOrder && actualOrder.length === 4;
+                const groupCorrect = hasResults ? order.filter((code, i) => code === actualOrder[i]).length : 0;
                 return (
                   <div key={group.name} className="glass-card p-4">
-                    <h3 className="mb-3 text-sm font-bold text-zinc-500 dark:text-zinc-400">
-                      Group {group.name}
-                    </h3>
+                    <div className="mb-3 flex items-center justify-between">
+                      <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400">
+                        Group {group.name}
+                      </h3>
+                      {hasResults && (
+                        <span className={`text-xs font-semibold ${groupCorrect === 4 ? "text-emerald-500" : groupCorrect >= 2 ? "text-orange-400" : "text-zinc-400"}`}>
+                          {groupCorrect}/4
+                        </span>
+                      )}
+                    </div>
                     <div className="space-y-2">
                       {order.map((code, i) => {
                         const team = group.teams.find((t) => t.code === code);
                         if (!team) return null;
+                        const isCorrect = hasResults && code === actualOrder[i];
+                        const actualPos = hasResults ? actualOrder.indexOf(code) + 1 : null;
                         return (
                           <div
                             key={code}
@@ -312,7 +329,10 @@ export default function PredictPage() {
                             onDragStart={() => !locked && handleDragStart(group.name, i)}
                             onDragOver={(e) => e.preventDefault()}
                             onDrop={() => handleDrop(group.name, i)}
-                            className="team-slot"
+                            className={hasResults
+                              ? `team-slot ${isCorrect ? "!border-emerald-500/30 !bg-emerald-500/5 dark:!bg-emerald-500/10" : "!border-red-500/20 !bg-red-500/5 dark:!bg-red-500/10"}`
+                              : "team-slot"
+                            }
                           >
                             {!locked && (
                               <div className="flex flex-col -my-1">
@@ -339,16 +359,20 @@ export default function PredictPage() {
                             </span>
                             <span className="text-lg">{team.flag}</span>
                             <span className="font-medium text-sm">{team.name}</span>
-                            {i < 2 && (
-                              <span className="ml-auto rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-400 hidden sm:inline">
-                                Qualifies
-                              </span>
-                            )}
-                            {i === 2 && (
-                              <span className="ml-auto rounded-full bg-orange-500/15 px-2 py-0.5 text-xs text-orange-400 hidden sm:inline">
-                                Possible
-                              </span>
-                            )}
+                            <span className="ml-auto flex items-center gap-1.5">
+                              {hasResults ? (
+                                isCorrect ? (
+                                  <span className="text-emerald-500 text-sm">✓</span>
+                                ) : (
+                                  <span className="text-xs text-red-400">✗ was {actualPos}{actualPos === 1 ? "st" : actualPos === 2 ? "nd" : actualPos === 3 ? "rd" : "th"}</span>
+                                )
+                              ) : (
+                                <>
+                                  {i < 2 && <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-400 hidden sm:inline">Qualifies</span>}
+                                  {i === 2 && <span className="rounded-full bg-orange-500/15 px-2 py-0.5 text-xs text-orange-400 hidden sm:inline">Possible</span>}
+                                </>
+                              )}
+                            </span>
                           </div>
                         );
                       })}
