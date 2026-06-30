@@ -200,7 +200,7 @@ export async function GET(request: Request) {
     // Merge with existing results so manual entries aren't overwritten
     const { data: existing } = await supabase
       .from("actual_results")
-      .select("group_results, knockout_results")
+      .select("group_results, knockout_results, tournament_winner")
       .eq("id", 1)
       .single();
 
