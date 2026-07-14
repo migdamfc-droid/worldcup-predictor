@@ -258,43 +258,40 @@ export default function ViewPredictionsPage() {
 
         {tab === "knockout" && (
           <div className="animate-fade-in">
-            <div className="overflow-x-auto pb-4">
-              <div className="flex min-w-[1200px] gap-4">
-                {["R32", "R16", "QF", "SF", "Final"].map((round) => {
-                  const matches = KNOCKOUT_STRUCTURE.filter((m) => m.round === round);
-                  return (
-                    <div key={round} className="flex-1">
-                      <h3 className="mb-3 text-center text-sm font-bold text-zinc-500 dark:text-zinc-400">
-                        {round === "R32" ? "Round of 32" : round === "R16" ? "Round of 16" : round === "QF" ? "Quarter-Finals" : round === "SF" ? "Semi-Finals" : "Final"}
-                      </h3>
-                      <div className="flex flex-col justify-around gap-2" style={{ minHeight: round === "R32" ? "auto" : "100%" }}>
-                        {matches.map((match) => {
-                          const teamA = resolveTeam(predictions.knockoutPredictions, match.seedA);
-                          const teamB = resolveTeam(predictions.knockoutPredictions, match.seedB);
-                          const displayA = getTeamDisplay(teamA);
-                          const displayB = getTeamDisplay(teamB);
-                          const winner = predictions.knockoutPredictions[match.id];
+            <div className="space-y-4">
+              {["R32", "R16", "QF", "SF", "Final"].map((round) => {
+                const matches = KNOCKOUT_STRUCTURE.filter((m) => m.round === round);
+                const roundLabel = round === "R32" ? "Round of 32" : round === "R16" ? "Round of 16" : round === "QF" ? "Quarter-Finals" : round === "SF" ? "Semi-Finals" : "Final";
+                return (
+                  <div key={round}>
+                    <h3 className="mb-3 text-sm font-bold text-zinc-500 dark:text-zinc-400">{roundLabel}</h3>
+                    <div className={`grid gap-2 ${round === "R32" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" : round === "R16" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" : round === "QF" ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 sm:grid-cols-2"}`}>
+                      {matches.map((match) => {
+                        const teamA = resolveTeam(predictions.knockoutPredictions, match.seedA);
+                        const teamB = resolveTeam(predictions.knockoutPredictions, match.seedB);
+                        const displayA = getTeamDisplay(teamA);
+                        const displayB = getTeamDisplay(teamB);
+                        const winner = predictions.knockoutPredictions[match.id];
 
-                          return (
-                            <div key={match.id} className="glass-card p-2">
-                              <div className="space-y-1">
-                                <div className={`rounded-lg border px-3 py-2 text-sm ${winner === teamA && teamA ? "border-zinc-400 bg-zinc-100 text-zinc-900 dark:border-zinc-500 dark:bg-zinc-800 dark:text-white" : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50"}`}>
-                                  <span className="mr-2">{displayA.flag}</span>
-                                  <span className="text-xs">{displayA.name}</span>
-                                </div>
-                                <div className={`rounded-lg border px-3 py-2 text-sm ${winner === teamB && teamB ? "border-zinc-400 bg-zinc-100 text-zinc-900 dark:border-zinc-500 dark:bg-zinc-800 dark:text-white" : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50"}`}>
-                                  <span className="mr-2">{displayB.flag}</span>
-                                  <span className="text-xs">{displayB.name}</span>
-                                </div>
+                        return (
+                          <div key={match.id} className="glass-card p-2">
+                            <div className="space-y-1">
+                              <div className={`rounded-lg border px-3 py-2 text-sm ${winner === teamA && teamA ? "border-zinc-400 bg-zinc-100 text-zinc-900 dark:border-zinc-500 dark:bg-zinc-800 dark:text-white" : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50"}`}>
+                                <span className="mr-2">{displayA.flag}</span>
+                                <span className="text-xs">{displayA.name}</span>
+                              </div>
+                              <div className={`rounded-lg border px-3 py-2 text-sm ${winner === teamB && teamB ? "border-zinc-400 bg-zinc-100 text-zinc-900 dark:border-zinc-500 dark:bg-zinc-800 dark:text-white" : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50"}`}>
+                                <span className="mr-2">{displayB.flag}</span>
+                                <span className="text-xs">{displayB.name}</span>
                               </div>
                             </div>
-                          );
-                        })}
-                      </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                  );
-                })}
-              </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
