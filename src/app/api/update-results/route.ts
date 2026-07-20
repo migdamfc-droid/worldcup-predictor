@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+function getSupabase() {
+  if (!supabaseUrl || !supabaseKey) throw new Error("Missing Supabase config");
+  return createClient(supabaseUrl, supabaseKey);
+}
 
 const SPORTSDB_URL =
   "https://www.thesportsdb.com/api/v1/json/3/eventsseason.php?id=4429&s=2026";
@@ -198,6 +202,7 @@ export async function GET(request: Request) {
     }
 
     // Merge with existing results so manual entries aren't overwritten
+    const supabase = getSupabase();
     const { data: existing } = await supabase
       .from("actual_results")
       .select("group_results, knockout_results, tournament_winner")
