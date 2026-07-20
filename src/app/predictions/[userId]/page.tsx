@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { GROUPS, KNOCKOUT_STRUCTURE, ALL_TEAMS } from "@/lib/teams";
-import { calculateScore, type Predictions, type ActualResults } from "@/lib/scoring";
+import { calculateScore, normalize, type Predictions, type ActualResults } from "@/lib/scoring";
 import Navbar from "@/components/Navbar";
 
 type Tab = "groups" | "knockout" | "extras";
@@ -337,7 +337,7 @@ export default function ViewPredictionsPage() {
               <div className="grid gap-6 sm:grid-cols-3">
                 {bonusItems.map(([label, predicted, actual, pts]) => {
                   const hasResult = !!actual;
-                  const isCorrect = hasResult && predicted.toLowerCase() === actual.toLowerCase();
+                  const isCorrect = hasResult && normalize(predicted) === normalize(actual);
                   return (
                     <div key={label} className={`glass-card p-6 ${hasResult ? (isCorrect ? "!border-emerald-500/30" : "!border-red-500/20") : ""}`}>
                       <div className="mb-2 flex items-center justify-between">

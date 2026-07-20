@@ -16,6 +16,10 @@ export interface ActualResults {
   best_player: string;
 }
 
+export function normalize(s: string): string {
+  return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+}
+
 export function calculateScore(pred: Predictions, actual: ActualResults): {
   total: number;
   groupPoints: number;
@@ -74,15 +78,15 @@ export function calculateScore(pred: Predictions, actual: ActualResults): {
     bonusPoints += 6;
     breakdown["tournament_winner"] = 6;
   }
-  if (actual.top_scorer && pred.top_scorer === actual.top_scorer) {
+  if (actual.top_scorer && normalize(pred.top_scorer) === normalize(actual.top_scorer)) {
     bonusPoints += 2;
     breakdown["top_scorer"] = 2;
   }
-  if (actual.top_assister && pred.top_assister === actual.top_assister) {
+  if (actual.top_assister && normalize(pred.top_assister) === normalize(actual.top_assister)) {
     bonusPoints += 2;
     breakdown["top_assister"] = 2;
   }
-  if (actual.best_player && pred.best_player === actual.best_player) {
+  if (actual.best_player && normalize(pred.best_player) === normalize(actual.best_player)) {
     bonusPoints += 3;
     breakdown["best_player"] = 3;
   }

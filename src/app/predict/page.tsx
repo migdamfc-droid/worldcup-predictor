@@ -6,6 +6,7 @@ import { GROUPS, KNOCKOUT_STRUCTURE, ALL_TEAMS } from "@/lib/teams";
 import type { User } from "@supabase/supabase-js";
 import Navbar from "@/components/Navbar";
 import Auth from "@/components/Auth";
+import { normalize } from "@/lib/scoring";
 
 type Tab = "groups" | "thirdplace" | "knockout" | "extras";
 
@@ -610,7 +611,7 @@ export default function PredictPage() {
                 ["Best Player", "bestPlayer", predictions.bestPlayer, actualBonuses.best_player, "+3 pts", "e.g. Lionel Messi"],
               ] as [string, string, string, string, string, string][]).map(([label, key, predicted, actual, pts, placeholder]) => {
                 const hasResult = !!actual;
-                const isCorrect = hasResult && predicted.toLowerCase() === actual.toLowerCase();
+                const isCorrect = hasResult && normalize(predicted) === normalize(actual);
                 return (
                   <div key={label} className={`glass-card p-6 ${hasResult ? (isCorrect ? "!border-emerald-500/30" : "!border-red-500/20") : ""}`}>
                     <h3 className="mb-1 text-lg font-bold">{label}</h3>
