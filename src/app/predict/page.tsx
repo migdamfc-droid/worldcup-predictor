@@ -57,6 +57,8 @@ export default function PredictPage() {
   const [authKey, setAuthKey] = useState(0);
   const [expandedRound, setExpandedRound] = useState<string>("R32");
   const [actualGroupResults, setActualGroupResults] = useState<Record<string, string[]>>({});
+  const [actualKnockoutResults, setActualKnockoutResults] = useState<Record<string, string>>({});
+  const [actualBonuses, setActualBonuses] = useState<{ tournament_winner: string; top_scorer: string; top_assister: string; best_player: string }>({ tournament_winner: "", top_scorer: "", top_assister: "", best_player: "" });
   const locked = new Date() >= LOCKOUT_DATE;
 
   const checkUser = useCallback(async () => {
@@ -81,8 +83,12 @@ export default function PredictPage() {
       }
     }
     // Fetch actual results for tick/cross display
-    const { data: resultsRow } = await supabase.from("actual_results").select("group_results").eq("id", 1).single();
-    if (resultsRow?.group_results) setActualGroupResults(resultsRow.group_results);
+    const { data: resultsRow } = await supabase.from("actual_results").select("*").eq("id", 1).single();
+    if (resultsRow) {
+      if (resultsRow.group_results) setActualGroupResults(resultsRow.group_results);
+      if (resultsRow.knockout_results) setActualKnockoutResults(resultsRow.knockout_results);
+      setActualBonuses({ tournament_winner: resultsRow.tournament_winner || "", top_scorer: resultsRow.top_scorer || "", top_assister: resultsRow.top_assister || "", best_player: resultsRow.best_player || "" });
+    }
 
     setLoading(false);
     setAuthKey((k) => k + 1);
@@ -494,14 +500,25 @@ export default function PredictPage() {
                           const displayA = getTeamDisplay(teamA);
                           const displayB = getTeamDisplay(teamB);
                           const winner = predictions.knockoutPredictions[match.id];
+                          const actualWinner = actualKnockoutResults[match.id];
+                          const hasResult = !!actualWinner;
+                          const isCorrect = hasResult && winner === actualWinner;
+                          const actualWinnerDisplay = getTeamDisplay(actualWinner || null);
                           return (
-                            <div key={match.id} className="space-y-1">
-                              <button onClick={() => !locked && teamA && setKnockoutWinner(match.id, teamA)} disabled={locked || !teamA} className={`w-full text-left ${winner === teamA && teamA ? "knockout-team-winner" : "knockout-team"}`}>
-                                <span className="mr-2">{displayA.flag}</span><span className="text-xs">{displayA.name}</span>
-                              </button>
-                              <button onClick={() => !locked && teamB && setKnockoutWinner(match.id, teamB)} disabled={locked || !teamB} className={`w-full text-left ${winner === teamB && teamB ? "knockout-team-winner" : "knockout-team"}`}>
-                                <span className="mr-2">{displayB.flag}</span><span className="text-xs">{displayB.name}</span>
-                              </button>
+                            <div key={match.id}>
+                              <div className="space-y-1">
+                                <button onClick={() => !locked && teamA && setKnockoutWinner(match.id, teamA)} disabled={locked || !teamA} className={`w-full text-left ${winner === teamA && teamA ? "knockout-team-winner" : "knockout-team"}`}>
+                                  <span className="mr-2">{displayA.flag}</span><span className="text-xs">{displayA.name}</span>
+                                </button>
+                                <button onClick={() => !locked && teamB && setKnockoutWinner(match.id, teamB)} disabled={locked || !teamB} className={`w-full text-left ${winner === teamB && teamB ? "knockout-team-winner" : "knockout-team"}`}>
+                                  <span className="mr-2">{displayB.flag}</span><span className="text-xs">{displayB.name}</span>
+                                </button>
+                              </div>
+                              {hasResult && (
+                                <div className={`mt-1 text-xs ${isCorrect ? "text-emerald-500" : "text-red-400"}`}>
+                                  {isCorrect ? "✓ Correct" : `✗ ${actualWinnerDisplay.flag} ${actualWinnerDisplay.name} won`}
+                                </div>
+                              )}
                             </div>
                           );
                         })}
@@ -529,8 +546,12 @@ export default function PredictPage() {
                           const displayA = getTeamDisplay(teamA);
                           const displayB = getTeamDisplay(teamB);
                           const winner = predictions.knockoutPredictions[match.id];
+                          const actualWinner = actualKnockoutResults[match.id];
+                          const hasResult = !!actualWinner;
+                          const isCorrect = hasResult && winner === actualWinner;
+                          const actualWinnerDisplay = getTeamDisplay(actualWinner || null);
                           return (
-                            <div key={match.id} className="glass-card p-2">
+                            <div key={match.id} className={`glass-card p-2 ${hasResult ? (isCorrect ? "!border-emerald-500/30" : "!border-red-500/20") : ""}`}>
                               <div className="space-y-1">
                                 <button onClick={() => !locked && teamA && setKnockoutWinner(match.id, teamA)} disabled={locked || !teamA} className={`w-full text-left ${winner === teamA && teamA ? "knockout-team-winner" : "knockout-team"}`}>
                                   <span className="mr-2">{displayA.flag}</span><span className="text-xs">{displayA.name}</span>
@@ -539,6 +560,11 @@ export default function PredictPage() {
                                   <span className="mr-2">{displayB.flag}</span><span className="text-xs">{displayB.name}</span>
                                 </button>
                               </div>
+                              {hasResult && (
+                                <div className={`mt-1.5 text-xs text-center ${isCorrect ? "text-emerald-500" : "text-red-400"}`}>
+                                  {isCorrect ? "✓ Correct" : `✗ ${actualWinnerDisplay.flag} ${actualWinnerDisplay.name} won`}
+                                </div>
+                              )}
                             </div>
                           );
                         })}
@@ -559,54 +585,52 @@ export default function PredictPage() {
             {(() => {
               const finalWinner = predictions.knockoutPredictions["final"];
               const display = getTeamDisplay(finalWinner || null);
+              const winnerCorrect = actualBonuses.tournament_winner && finalWinner === actualBonuses.tournament_winner;
+              const actualWinnerDisplay = getTeamDisplay(actualBonuses.tournament_winner || null);
               return (
-                <div className="mb-6 glass-card p-6">
+                <div className={`mb-6 glass-card p-6 ${actualBonuses.tournament_winner ? (winnerCorrect ? "!border-emerald-500/30" : "!border-red-500/20") : ""}`}>
                   <h3 className="mb-1 text-lg font-bold">Your Predicted Winner</h3>
                   <p className="mb-3 text-xs text-slate-500">+6 points if correct — set by your knockout bracket picks</p>
                   <div className="flex items-center gap-3 rounded-lg bg-zinc-100 dark:bg-white/5 px-4 py-3">
                     <span className="text-2xl">{display.flag}</span>
                     <span className="text-lg font-semibold">{finalWinner ? display.name : "Complete your knockout bracket to set this"}</span>
+                    {actualBonuses.tournament_winner && (
+                      <span className={`ml-auto text-sm ${winnerCorrect ? "text-emerald-500" : "text-red-400"}`}>
+                        {winnerCorrect ? "✓ Correct" : `✗ ${actualWinnerDisplay.flag} ${actualWinnerDisplay.name} won`}
+                      </span>
+                    )}
                   </div>
                 </div>
               );
             })()}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="glass-card p-6">
-                <h3 className="mb-1 text-lg font-bold">Top Scorer</h3>
-                <p className="mb-3 text-xs text-slate-500">+2 points if correct</p>
-                <input
-                  type="text"
-                  value={predictions.topScorer}
-                  onChange={(e) => setPredictions((p) => ({ ...p, topScorer: e.target.value }))}
-                  disabled={locked}
-                  className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-zinc-900 outline-none focus:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-white dark:focus:border-zinc-500 disabled:opacity-50"
-                  placeholder="e.g. Kylian Mbappé"
-                />
-              </div>
-              <div className="glass-card p-6">
-                <h3 className="mb-1 text-lg font-bold">Top Assister</h3>
-                <p className="mb-3 text-xs text-slate-500">+2 points if correct</p>
-                <input
-                  type="text"
-                  value={predictions.topAssister}
-                  onChange={(e) => setPredictions((p) => ({ ...p, topAssister: e.target.value }))}
-                  disabled={locked}
-                  className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-zinc-900 outline-none focus:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-white dark:focus:border-zinc-500 disabled:opacity-50"
-                  placeholder="e.g. Kevin De Bruyne"
-                />
-              </div>
-              <div className="glass-card p-6">
-                <h3 className="mb-1 text-lg font-bold">Best Player</h3>
-                <p className="mb-3 text-xs text-slate-500">+3 points if correct</p>
-                <input
-                  type="text"
-                  value={predictions.bestPlayer}
-                  onChange={(e) => setPredictions((p) => ({ ...p, bestPlayer: e.target.value }))}
-                  disabled={locked}
-                  className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-zinc-900 outline-none focus:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-white dark:focus:border-zinc-500 disabled:opacity-50"
-                  placeholder="e.g. Lionel Messi"
-                />
-              </div>
+              {([
+                ["Top Scorer", "topScorer", predictions.topScorer, actualBonuses.top_scorer, "+2 pts", "e.g. Kylian Mbappé"],
+                ["Top Assister", "topAssister", predictions.topAssister, actualBonuses.top_assister, "+2 pts", "e.g. Kevin De Bruyne"],
+                ["Best Player", "bestPlayer", predictions.bestPlayer, actualBonuses.best_player, "+3 pts", "e.g. Lionel Messi"],
+              ] as [string, string, string, string, string, string][]).map(([label, key, predicted, actual, pts, placeholder]) => {
+                const hasResult = !!actual;
+                const isCorrect = hasResult && predicted.toLowerCase() === actual.toLowerCase();
+                return (
+                  <div key={label} className={`glass-card p-6 ${hasResult ? (isCorrect ? "!border-emerald-500/30" : "!border-red-500/20") : ""}`}>
+                    <h3 className="mb-1 text-lg font-bold">{label}</h3>
+                    <p className="mb-3 text-xs text-slate-500">{pts}</p>
+                    <input
+                      type="text"
+                      value={predicted}
+                      onChange={(e) => setPredictions((p) => ({ ...p, [key]: e.target.value }))}
+                      disabled={locked}
+                      className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-zinc-900 outline-none focus:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-white dark:focus:border-zinc-500 disabled:opacity-50"
+                      placeholder={placeholder}
+                    />
+                    {hasResult && (
+                      <p className={`mt-2 text-xs ${isCorrect ? "text-emerald-500" : "text-red-400"}`}>
+                        {isCorrect ? "✓ Correct" : `✗ Answer: ${actual}`}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
             </div>
             <div className="mt-8 glass-card p-6">
               <h3 className="mb-4 text-lg font-bold">Scoring System</h3>

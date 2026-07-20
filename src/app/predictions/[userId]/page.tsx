@@ -31,6 +31,8 @@ export default function ViewPredictionsPage() {
   const [tab, setTab] = useState<Tab>("groups");
   const [score, setScore] = useState<{ total: number; groupPoints: number; knockoutPoints: number; bonusPoints: number } | null>(null);
   const [actualGroupResults, setActualGroupResults] = useState<Record<string, string[]>>({});
+  const [actualKnockoutResults, setActualKnockoutResults] = useState<Record<string, string>>({});
+  const [actualBonuses, setActualBonuses] = useState<{ tournament_winner: string; top_scorer: string; top_assister: string; best_player: string }>({ tournament_winner: "", top_scorer: "", top_assister: "", best_player: "" });
   const [copied, setCopied] = useState(false);
 
   const shareLink = () => {
@@ -77,6 +79,8 @@ export default function ViewPredictionsPage() {
           best_player: resultsRow.best_player || "",
         };
         setActualGroupResults(actual.group_results);
+        setActualKnockoutResults(actual.knockout_results);
+        setActualBonuses({ tournament_winner: actual.tournament_winner, top_scorer: actual.top_scorer, top_assister: actual.top_assister, best_player: actual.best_player });
         const p: Predictions = {
           group_predictions: predData.groupPredictions,
           knockout_predictions: predData.knockoutPredictions,
@@ -272,9 +276,13 @@ export default function ViewPredictionsPage() {
                         const displayA = getTeamDisplay(teamA);
                         const displayB = getTeamDisplay(teamB);
                         const winner = predictions.knockoutPredictions[match.id];
+                        const actualWinner = actualKnockoutResults[match.id];
+                        const hasResult = !!actualWinner;
+                        const isCorrect = hasResult && winner === actualWinner;
+                        const actualWinnerDisplay = getTeamDisplay(actualWinner || null);
 
                         return (
-                          <div key={match.id} className="glass-card p-2">
+                          <div key={match.id} className={`glass-card p-2 ${hasResult ? (isCorrect ? "!border-emerald-500/30" : "!border-red-500/20") : ""}`}>
                             <div className="space-y-1">
                               <div className={`rounded-lg border px-3 py-2 text-sm ${winner === teamA && teamA ? "border-zinc-400 bg-zinc-100 text-zinc-900 dark:border-zinc-500 dark:bg-zinc-800 dark:text-white" : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50"}`}>
                                 <span className="mr-2">{displayA.flag}</span>
@@ -285,6 +293,11 @@ export default function ViewPredictionsPage() {
                                 <span className="text-xs">{displayB.name}</span>
                               </div>
                             </div>
+                            {hasResult && (
+                              <div className={`mt-1.5 text-xs text-center ${isCorrect ? "text-emerald-500" : "text-red-400"}`}>
+                                {isCorrect ? "✓ Correct" : `✗ ${actualWinnerDisplay.flag} ${actualWinnerDisplay.name} won`}
+                              </div>
+                            )}
                           </div>
                         );
                       })}
@@ -296,29 +309,54 @@ export default function ViewPredictionsPage() {
           </div>
         )}
 
-        {tab === "extras" && (
-          <div className="animate-fade-in">
-            <div className="mb-6 glass-card p-6">
-              <h3 className="mb-1 text-lg font-bold">Predicted Winner</h3>
-              <div className="flex items-center gap-3 rounded-lg bg-zinc-100 dark:bg-white/5 px-4 py-3">
-                <span className="text-2xl">{winnerDisplay.flag}</span>
-                <span className="text-lg font-semibold">{finalWinner ? winnerDisplay.name : "Not set"}</span>
+        {tab === "extras" && (() => {
+          const winnerCorrect = actualBonuses.tournament_winner && finalWinner === actualBonuses.tournament_winner;
+          const actualWinnerDisplay = getTeamDisplay(actualBonuses.tournament_winner || null);
+          const bonusItems: [string, string, string, string][] = [
+            ["Top Scorer", predictions.topScorer, actualBonuses.top_scorer, "+2 pts"],
+            ["Top Assister", predictions.topAssister, actualBonuses.top_assister, "+2 pts"],
+            ["Best Player", predictions.bestPlayer, actualBonuses.best_player, "+3 pts"],
+          ];
+          return (
+            <div className="animate-fade-in">
+              <div className={`mb-6 glass-card p-6 ${actualBonuses.tournament_winner ? (winnerCorrect ? "!border-emerald-500/30" : "!border-red-500/20") : ""}`}>
+                <div className="mb-1 flex items-center justify-between">
+                  <h3 className="text-lg font-bold">Predicted Winner</h3>
+                  <span className="text-xs text-zinc-500">+6 pts</span>
+                </div>
+                <div className="flex items-center gap-3 rounded-lg bg-zinc-100 dark:bg-white/5 px-4 py-3">
+                  <span className="text-2xl">{winnerDisplay.flag}</span>
+                  <span className="text-lg font-semibold">{finalWinner ? winnerDisplay.name : "Not set"}</span>
+                  {actualBonuses.tournament_winner && (
+                    <span className={`ml-auto text-sm ${winnerCorrect ? "text-emerald-500" : "text-red-400"}`}>
+                      {winnerCorrect ? "✓ Correct" : `✗ ${actualWinnerDisplay.flag} ${actualWinnerDisplay.name} won`}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="grid gap-6 sm:grid-cols-3">
+                {bonusItems.map(([label, predicted, actual, pts]) => {
+                  const hasResult = !!actual;
+                  const isCorrect = hasResult && predicted.toLowerCase() === actual.toLowerCase();
+                  return (
+                    <div key={label} className={`glass-card p-6 ${hasResult ? (isCorrect ? "!border-emerald-500/30" : "!border-red-500/20") : ""}`}>
+                      <div className="mb-2 flex items-center justify-between">
+                        <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400">{label}</h3>
+                        <span className="text-xs text-zinc-500">{pts}</span>
+                      </div>
+                      <p className="text-lg font-semibold">{predicted || "Not set"}</p>
+                      {hasResult && (
+                        <p className={`mt-2 text-xs ${isCorrect ? "text-emerald-500" : "text-red-400"}`}>
+                          {isCorrect ? "✓ Correct" : `✗ Answer: ${actual}`}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
-            <div className="grid gap-6 sm:grid-cols-3">
-              {[
-                ["Top Scorer", predictions.topScorer],
-                ["Top Assister", predictions.topAssister],
-                ["Best Player", predictions.bestPlayer],
-              ].map(([label, value]) => (
-                <div key={label} className="glass-card p-6">
-                  <h3 className="mb-2 text-sm font-bold text-zinc-500 dark:text-zinc-400">{label}</h3>
-                  <p className="text-lg font-semibold">{value || "Not set"}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
     </>
   );
